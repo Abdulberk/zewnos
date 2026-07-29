@@ -1,0 +1,54 @@
+# Katman sinirlarini CI'da dogrulayan sozlesme.
+#   calistirmak icin:  lint-imports
+#
+# Buradaki kurallar "temiz mimari yaptim" iddiasinin kanitidir: ihlal edilirse
+# komut sifirdan farkli kod dondurur ve build kirilir.
+
+[importlinter]
+root_package = app
+# Harici paketleri (fastapi, sqlalchemy, anthropic) yasaklayabilmek icin gerekli.
+include_external_packages = True
+
+# ---------------------------------------------------------------------------
+# 1) Katman sirasi: ust katman alt katmani cagirabilir, tersi olamaz.
+# ---------------------------------------------------------------------------
+[importlinter:contract:layers]
+name = Katmanli mimari (api -> services -> domain)
+type = layers
+layers =
+    app.api
+    app.services
+    app.domain
+
+# ---------------------------------------------------------------------------
+# 2) Domain saf kalmali: hicbir framework'e bagimli olamaz.
+#    Bu sayede analitik cekirdek FastAPI/SQLAlchemy/Anthropic olmadan
+#    dogrudan unit test edilebilir.
+# ---------------------------------------------------------------------------
+[importlinter:contract:domain-purity]
+name = Domain katmani cerceveden bagimsiz
+type = forbidden
+source_modules =
+    app.domain
+forbidden_modules =
+    fastapi
+    sqlalchemy
+    anthropic
+    app.api
+    app.services
+    app.storage
+    app.ai
+
+# ---------------------------------------------------------------------------
+# 3) AI katmani domain'i okuyabilir ama domain AI'i bilmemeli (2 ile birlikte).
+#    AI katmani da storage'a dogrudan dokunmamali; onbellek servis katmanindan
+#    gecer.
+# ---------------------------------------------------------------------------
+[importlinter:contract:ai-isolation]
+name = AI katmani storage'a dogrudan erisemez
+type = forbidden
+source_modules =
+    app.ai
+forbidden_modules =
+    app.storage
+    app.api

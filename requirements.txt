@@ -1,0 +1,26 @@
+# --- web ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+
+# --- validation / config ---
+pydantic==2.10.4
+pydantic-settings==2.7.0
+
+# --- analytics ---
+polars==1.19.0
+
+# --- ai ---
+# 0.120+ gerekli: messages.parse() (structured outputs), output_config.effort
+# ve cache_control (prompt caching) bu surumle geliyor.
+anthropic==0.120.2
+
+# --- storage ---
+sqlalchemy==2.0.36
+aiosqlite==0.20.0
+
+# --- ingestion ---
+chardet==7.4.3
+
+# --- report export ---
+reportlab==4.2.5

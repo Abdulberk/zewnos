@@ -1,0 +1,30 @@
+# --- secrets ---
+.env
+.env.local
+*.key
+
+# --- python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- runtime data ---
+# Calisma zamaninda uretilen her sey. Ornek bir cikti raporu
+# docs/ornek-rapor.pdf olarak ayrica saklaniyor.
+storage/*
+!storage/uploads/
+storage/uploads/*
+!storage/uploads/.gitkeep
+*.db
+*.sqlite3
+
+# --- editor / os ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

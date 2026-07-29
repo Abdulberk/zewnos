@@ -1,0 +1,92 @@
+kampanya_id,kampanya_adi,platform,urun_kategorisi,donem,harcama_tl,gosterim,tiklama,frekans,donusum,gelir_tl
+K001,Yaz Koleksiyonu Lansman,Instagram,Kadin Giyim,2026-01,1280,56000,1160,1.3,28,4200
+K002,Erkek Basic Tisort Serisi,Instagram,Erkek Giyim,2026-01,2024,87400,1311,1.8,34,4195
+K003,Ev Tekstili Indirim,Facebook,Ev Tekstili,2026-01,2852,128800,1932,2.0,41,6210
+K004,Aksesuar Yeni Sezon,Instagram,Aksesuar,2026-01,1656,80960,1619,1.9,26,2401
+K005,Kadin Elbise Retargeting,Instagram,Kadin Giyim,2026-01,3240,54000,2160,1.4,108,16200
+K006,Erkek Ceket Kampanyasi,Facebook,Erkek Giyim,2026-01,3120,76930,1214,2.0,17,2491
+K007,Nevresim Takimi Story Reklam,Instagram,Ev Tekstili,2026-01,1380,66240,993,1.7,28,4278
+K008,Kadin Ayakkabi Carousel,Instagram,Aksesuar,2026-01,2484,92920,1858,1.8,53,8004
+K009,Cocuk Giyim Anneler Gunu,Facebook,Cocuk Giyim,2026-01,1840,78200,1173,2.1,36,5520
+K010,Havlu Bornoz Seti,Instagram,Ev Tekstili,2026-01,1104,49680,745,1.6,17,2622
+K011,Kadin Giyim Genis Kitle,Instagram,Kadin Giyim,2026-01,6000,250000,3750,1.6,46,7020
+K012,Erkek Ayakkabi Flash Sale,Facebook,Erkek Giyim,2026-01,2208,90160,1352,1.9,30,4554
+K013,Yastik Dekor Serisi,Instagram,Ev Tekstili,2026-01,828,37720,565,1.5,11,1656
+K014,Kadin Canta Yeni Sezon,Instagram,Aksesuar,2026-01,3036,105800,2116,1.8,60,9108
+K015,Cocuk Ayakkabi Kampanya,Facebook,Cocuk Giyim,2026-01,1472,64400,966,2.0,19,2898
+K001,Yaz Koleksiyonu Lansman,Instagram,Kadin Giyim,2026-02,1440,63000,1305,1.4,31,4725
+K002,Erkek Basic Tisort Serisi,Instagram,Erkek Giyim,2026-02,2134,92150,1382,1.8,36,4423
+K003,Ev Tekstili Indirim,Facebook,Ev Tekstili,2026-02,3007,135800,2037,2.0,43,6547
+K003,Ev Tekstili Indirim,Facebook,Ev Tekstili,2026-02,3007,135800,2037,2.0,43,6547
+K004,Aksesuar Yeni Sezon,Instagram,Aksesuar,2026-02,1746,85360,1707,1.9,28,2531
+K005,Kadin Elbise Retargeting,Instagram,Kadin Giyim,2026-02,3420,57000,2280,1.4,114,17100
+K006,Erkek Ceket Kampanyasi,Facebook,Erkek Giyim,2026-02,3900,89936,1388,2.1,19,2817
+K007,Nevresim Takimi Story Reklam,Instagram,Ev Tekstili,2026-02,1455,69840,1047,1.7,30,4510
+K008,Kadin Ayakkabi Carousel,Instagram,Aksesuar,2026-02,2619,97970,1959,1.8,56,8439
+K009,Cocuk Giyim Anneler Gunu,Facebook,Cocuk Giyim,2026-02,1940,82450,1236,2.1,38,5820
+K010,Havlu Bornoz Seti,Instagram,Ev Tekstili,2026-02,1164,52380,785,1.6,18,2764
+K011,Kadin Giyim Genis Kitle,Instagram,Kadin Giyim,2026-02,6300,257500,3262,2.2,40,6107
+K012,Erkek Ayakkabi Flash Sale,Facebook,Erkek Giyim,2026-02,2328,95060,1425,1.9,32,4801
+K013,Yastik Dekor Serisi,Instagram,Ev Tekstili,2026-02,873,39770,596,1.5,11,1746
+K014,Kadin Canta Yeni Sezon,Instagram,Aksesuar,2026-02,3201,111550,2231,1.8,64,9603
+K015,Cocuk Ayakkabi Kampanya,Facebook,Cocuk Giyim,2026-02,1552,67900,1018,2.0,20,3055
+K001,Yaz Koleksiyonu Lansman,Instagram,Kadin Giyim,2026-03,1920,84000,1740,1.4,42,6300
+K002,Erkek Basic Tisort Serisi,Instagram,Erkek Giyim,2026-03,2200,95000,1425,1.9,38,4560
+K003,Ev Tekstili Indirim,Facebook,Ev Tekstili,2026-03,3100,140000,2100,2.1,45,6750
+K004,Aksesuar Yeni Sezon,Instagram,Aksesuar,2026-03,1800,88000,1760,2.0,29,2610
+K005,Kadin Elbise Retargeting,Instagram,Kadin Giyim,2026-03,3600,60000,2400,1.5,120,18000
+K006,Erkek Ceket Kampanyasi,Facebook,Erkek Giyim,2026-03,4680,102179,1548,2.3,20,3114
+K007,Nevresim Takimi Story Reklam,Instagram,Ev Tekstili,2026-03,1500,72000,1080,1.8,31,4650
+K008,Kadin Ayakkabi Carousel,Instagram,Aksesuar,2026-03,2700,101000,2020,1.9,58,8700
+K009,Cocuk Giyim Anneler Gunu,Facebook,Cocuk Giyim,2026-03,,,,,,
+K010,Havlu Bornoz Seti,Instagram,Ev Tekstili,2026-03,1200,54000,810,1.7,19,2850
+K011,Kadin Giyim Genis Kitle,Instagram,Kadin Giyim,2026-03,6600,265000,2775,2.7,34,5194
+K012,Erkek Ayakkabi Flash Sale,Facebook,Erkek Giyim,2026-03,2400,98000,1470,2.0,33,4950
+K013,Yastik Dekor Serisi,Instagram,Ev Tekstili,2026-03,900,41000,615,1.6,12,1800
+K014,Kadin Canta Yeni Sezon,Instagram,Aksesuar,2026-03,3300,115000,2300,1.9,66,9900
+K015,Cocuk Ayakkabi Kampanya,Facebook,Cocuk Giyim,2026-03,1600,70000,1050,2.1,21,3150
+K001,Yaz Koleksiyonu Lansman,Instagram,Kadin Giyim,2026-04,2720,119000,2465,1.5,59,8925
+K002,Erkek Basic Tisort Serisi,Instagram,Erkek Giyim,2026-04,2266,97850,1467,1.9,39,4696
+K003,Ev Tekstili Indirim,Facebook,Ev Tekstili,2026-04,3193,144200,2163,2.1,46,6952
+K004,Aksesuar Yeni Sezon,Instagram,Aksesuar,2026-04,1854,90640,1812,2.0,29,2688
+K005,Kadin Elbise Retargeting,Instagram,Kadin Giyim,2026-04,3780,63000,2520,1.5,126,18900
+K006,Erkek Ceket Kampanyasi,Facebook,Erkek Giyim,2026-04,5720,117589,1747,2.5,23,3477
+K007,Nevresim Takimi Story Reklam,Instagram,Ev Tekstili,2026-04,1545,74160,1112,1.8,31,4789
+K008,Kadin Ayakkabi Carousel,Instagram,Aksesuar,2026-04,2781,104030,2080,1.9,59,8961
+K009,Cocuk Giyim Anneler Gunu,Facebook,Cocuk Giyim,2026-04,2060,87550,1313,2.2,41,6180
+K010,Havlu Bornoz Seti,Instagram,Ev Tekstili,2026-04,1236,55620,834,1.7,19,2935
+K011,Kadin Giyim Genis Kitle,Instagram,Kadin Giyim,2026-04,6899,272500,2287,3.2,28,4282
+K012,Erkek Ayakkabi Flash Sale,Facebook,Erkek Giyim,2026-04,2472,100940,1514,2.0,33,5098
+K013,Yastik Dekor Serisi,Instagram,Ev Tekstili,2026-04,927,42230,633,1.6,12,1854
+K014,Kadin Canta Yeni Sezon,Instagram,Aksesuar,2026-04,3399,118450,2369,1.9,67,10197
+K015,Cocuk Ayakkabi Kampanya,Facebook,Cocuk Giyim,2026-04,1648,72100,1081,2.1,21,3244
+K001,Yaz Koleksiyonu Lansman,Instagram,Kadin Giyim,2026-05,4160,182000,3770,1.5,91,13650
+K002,Erkek Basic Tisort Serisi,Instagram,Erkek Giyim,2026-05,2310,99750,1496,2.0,39,4788
+K003,Ev Tekstili Indirim,Facebook,Ev Tekstili,2026-05,3255,147000,2205,2.2,47,7087
+K004,Aksesuar Yeni Sezon,Instagram,Aksesuar,2026-05,1890,92400,1848,2.1,30,2740
+K005,Kadin Elbise Retargeting,Instagram,Kadin Giyim,2026-05,3960,66000,2640,1.5,132,19800
+K006,Erkek Ceket Kampanyasi,Facebook,Erkek Giyim,2026-05,7279,139213,2019,2.6,26,3970
+K007,Nevresim Takimi Story Reklam,Instagram,Ev Tekstili,2026-05,1575,75600,1134,1.9,32,4882
+K008,Kadin Ayakkabi Carousel,Instagram,Aksesuar,2026-05,2835,106050,2121,2.0,60,9135
+K009,Cocuk Giyim Anneler Gunu,Facebook,Cocuk Giyim,2026-05,2100,89250,1338,2.3,42,6300
+K010,Havlu Bornoz Seti,Instagram,Ev Tekstili,2026-05,1260,56700,850,1.8,19,2992
+K011,Kadin Giyim Genis Kitle,Instagram,Kadin Giyim,2026-05,7200,280000,1800,3.8,22,3369
+K012,Erkek Ayakkabi Flash Sale,Facebook,Erkek Giyim,2026-05,2520,102900,1543,2.1,34,5197
+K013,Yastik Dekor Serisi,Instagram,Ev Tekstili,2026-05,945,43050,645,1.7,12,1890
+K014,Kadin Canta Yeni Sezon,Instagram,Aksesuar,2026-05,3465,120750,2415,2.0,69,10395
+K015,Cocuk Ayakkabi Kampanya,Facebook,Cocuk Giyim,2026-05,1680,73500,1102,2.2,22,3307
+K001,Yaz Koleksiyonu Lansman,Instagram,Kadin Giyim,2026-06,5440,238000,4930,1.6,119,17850
+K002,Erkek Basic Tisort Serisi,Instagram,Erkek Giyim,2026-06,2244,96900,1453,2.0,38,4651
+K003,Ev Tekstili Indirim,Facebook,Ev Tekstili,2026-06,3162,142800,2142,2.2,45,6885
+K004,Aksesuar Yeni Sezon,Instagram,Aksesuar,2026-06,1836,89760,1795,2.1,29,2662
+K005,Kadin Elbise Retargeting,Instagram,Kadin Giyim,2026-06,4140,69000,2760,1.5,138,20700
+K006,Erkek Ceket Kampanyasi,Facebook,Erkek Giyim,2026-06,9360,165990,2347,2.8,29,4559
+K007,Nevresim Takimi Story Reklam,Instagram,Ev Tekstili,2026-06,1530,73440,1101,1.9,31,4743
+K008,Kadin Ayakkabi Carousel,Instagram,Aksesuar,2026-06,2754,103020,2060,2.0,59,8874
+K009,Cocuk Giyim Anneler Gunu,Facebook,Cocuk Giyim,2026-06,2040,86700,1300,2.3,40,6120
+K010,Havlu Bornoz Seti,Instagram,Ev Tekstili,2026-06,1224,55080,826,1.8,19,2907
+K011,Kadin Giyim Genis Kitle,Instagram,Kadin Giyim,2026-06,7500,287500,1312,4.3,16,2457
+K012,Erkek Ayakkabi Flash Sale,Facebook,Erkek Giyim,2026-06,2448,99960,1499,2.1,33,5049
+K013,Yastik Dekor Serisi,Instagram,Ev Tekstili,2026-06,918,41820,627,1.7,12,1836
+K014,Kadin Canta Yeni Sezon,Instagram,Aksesuar,2026-06,3366,117300,2346,2.0,67,10098
+K015,Cocuk Ayakkabi Kampanya,Facebook,Cocuk Giyim,2026-06,1632,71400,1071,2.2,21,3213

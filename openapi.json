@@ -1,0 +1,1895 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Sonart Insight API",
+    "description": "\nERP ve reklam raporlarini yonetim dashboard'una ceviren analiz servisi.\n\n**Mimarinin iki tasiyici fikri:**\n\n1. **Dataset Pack** — boru hattinin tamami (okuma, kodlama onarimi, veri\n   kalitesi, zaman serisi, risk tespiti, AI) rapor tipinden bagimsizdir. Bir\n   rapora ozgu her sey tek bir yapilandirma nesnesinde toplanir. Yeni rapor\n   eklemek = yeni pack yazmak.\n\n2. **Sayiyi Polars hesaplar, AI yorumlar.** Modele ham veri hic verilmez;\n   yalnizca hesaplanmis tablolar gider. Uretilen her aksiyon sema geregi kanit\n   tasimak zorundadir ve her kanit hesaplanmis degerle karsilastirilarak\n   dogrulanir (`grounding_ratio`).\n",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Servis ayakta mi",
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Api V1 Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Bagimliliklar hazir mi",
+        "operationId": "ready_api_v1_health_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Ready Api V1 Health Ready Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/packs": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Tanimli rapor tipleri",
+        "description": "Her kayit bir 'dataset pack'. Yeni bir rapor tipi eklemek icin motora, endpoint'lere veya AI katmanina dokunmak gerekmez -- yalnizca yeni bir pack tanimlanip buraya kaydedilir.",
+        "operationId": "packs_api_v1_packs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PackOut"
+                  },
+                  "type": "array",
+                  "title": "Response Packs Api V1 Packs Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Yuklenmis veri setleri",
+        "operationId": "list_datasets_api_v1_datasets_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DatasetSummary"
+                  },
+                  "type": "array",
+                  "title": "Response List Datasets Api V1 Datasets Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "CSV yukle ve isle",
+        "operationId": "upload_dataset_api_v1_datasets_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_dataset_api_v1_datasets_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Veri seti ozeti",
+        "operationId": "get_dataset_api_v1_datasets__dataset_id__get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Veri setini sil",
+        "operationId": "delete_dataset_api_v1_datasets__dataset_id__delete",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/quality": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Veri kalitesi raporu",
+        "description": "Tespit edilen her sorun; agirligi, kac satiri etkiledigi ve **ne yapildigi** (onarildi / turetildi / silindi / karantina / isaretlendi) ile birlikte.",
+        "operationId": "get_quality_api_v1_datasets__dataset_id__quality_get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/overview": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Dashboard ozeti",
+        "operationId": "get_overview_api_v1_datasets__dataset_id__overview_get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          },
+          {
+            "name": "top",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "description": "Donulecek risk sayisi",
+              "default": 8,
+              "title": "Top"
+            },
+            "description": "Donulecek risk sayisi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/periods": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Donemsel trend ve degisim verisi",
+        "operationId": "get_periods_api_v1_datasets__dataset_id__periods_get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/entities": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Kayit bazinda ozet ve zaman serisi",
+        "operationId": "get_entities_api_v1_datasets__dataset_id__entities_get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          },
+          {
+            "name": "include_series",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "(kayit, donem) uzun tablosunu da dondur",
+              "default": true,
+              "title": "Include Series"
+            },
+            "description": "(kayit, donem) uzun tablosunu da dondur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntitiesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/risks": {
+      "get": {
+        "tags": [
+          "datasets"
+        ],
+        "summary": "Risk sicili",
+        "operationId": "get_risks_api_v1_datasets__dataset_id__risks_get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Agirliga gore filtre, or. 'kritik'",
+              "title": "Severity"
+            },
+            "description": "Agirliga gore filtre, or. 'kritik'"
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Yalnizca bu donemde acilan riskler",
+              "title": "Period"
+            },
+            "description": "Yalnizca bu donemde acilan riskler"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RisksResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/analysis/status": {
+      "get": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Analiz hazir mi, kac cagri gerekecek",
+        "description": "Frontend'in 'analiz uret' butonunu maliyet uyarisiyla gostermesi icin. Onbellekte varsa cagri yapilmayacagini bildirir.",
+        "operationId": "analysis_status_api_v1_datasets__dataset_id__analysis_status_get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/analysis": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Donemsel analiz + yonetici ozeti uret",
+        "description": "Her donem icin paralel bir AI cagrisi, ardindan tek bir sentez cagrisi. Sonuc onbellege yazilir; ayni veri seti icin tekrar cagrildiginda AI'a gidilmez. `refresh=true` ile yeniden uretilebilir.",
+        "operationId": "create_analysis_api_v1_datasets__dataset_id__analysis_post",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          },
+          {
+            "name": "refresh",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Onbellegi yok say ve yeniden uret",
+              "default": false,
+              "title": "Refresh"
+            },
+            "description": "Onbellegi yok say ve yeniden uret"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/ask": {
+      "post": {
+        "tags": [
+          "analysis"
+        ],
+        "summary": "Veri uzerinde serbest soru-cevap",
+        "description": "Model SQL yazmaz: hesaplanmis tablolari yorumlar. Boylece 'AI sayi hesaplamaz' kurali soru-cevapta da korunur ve her yanit kanit tasir.",
+        "operationId": "ask_api_v1_datasets__dataset_id__ask_post",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AskResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/report.pdf": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Paylasilabilir yonetici raporu (PDF)",
+        "description": "KPI'lar, donemsel trend, risk sicili ve veri kalitesi notlari. AI analizi onbellekte varsa yonetici ozeti ve doneme ozgu aksiyonlar da eklenir; yoksa rapor yalnizca hesaplanmis verilerle uretilir ve AI cagrisi yapilmaz.",
+        "operationId": "download_report_api_v1_datasets__dataset_id__report_pdf_get",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset Id"
+            }
+          },
+          {
+            "name": "include_ai",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Onbellekteki AI analizini rapora dahil et (yeni cagri yapmaz)",
+              "default": true,
+              "title": "Include Ai"
+            },
+            "description": "Onbellekteki AI analizini rapora dahil et (yeni cagri yapmaz)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/pdf": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Action": {
+        "properties": {
+          "priority": {
+            "type": "string",
+            "enum": [
+              "kritik",
+              "yuksek",
+              "orta",
+              "dusuk"
+            ],
+            "title": "Priority"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Tek cumlelik, emir kipinde eylem basligi."
+          },
+          "rationale": {
+            "type": "string",
+            "title": "Rationale",
+            "description": "Neden simdi ve neden bu urun/kayit icin."
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Evidence",
+            "description": "Bu aksiyonu dogrulayan, tablolardan alinmis sayilar."
+          },
+          "owner": {
+            "type": "string",
+            "title": "Owner",
+            "description": "Sorumlu departman."
+          },
+          "horizon": {
+            "type": "string",
+            "enum": [
+              "bu_hafta",
+              "bu_ay",
+              "bu_ceyrek"
+            ],
+            "title": "Horizon"
+          },
+          "expected_impact_tl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Impact Tl",
+            "description": "Parasal etki tahmini; hesaplanamiyorsa bos birak."
+          }
+        },
+        "type": "object",
+        "required": [
+          "priority",
+          "title",
+          "rationale",
+          "evidence",
+          "owner",
+          "horizon"
+        ],
+        "title": "Action",
+        "description": "Somut, sahiplenilebilir bir aksiyon onerisi."
+      },
+      "AnalysisResponse": {
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "title": "Dataset Id"
+          },
+          "pack_key": {
+            "type": "string",
+            "title": "Pack Key"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "cached": {
+            "type": "boolean",
+            "title": "Cached",
+            "description": "True ise sonuc onbellekten geldi; yeni AI cagrisi yapilmadi."
+          },
+          "cached_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cached At"
+          },
+          "periods": {
+            "items": {
+              "$ref": "#/components/schemas/PeriodAnalysis"
+            },
+            "type": "array",
+            "title": "Periods"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExecutiveSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "grounding": {
+            "$ref": "#/components/schemas/GroundingOut"
+          },
+          "telemetry": {
+            "$ref": "#/components/schemas/TelemetryOut"
+          },
+          "failed_periods": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Failed Periods"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "pack_key",
+          "model",
+          "cached",
+          "periods",
+          "summary",
+          "grounding",
+          "telemetry"
+        ],
+        "title": "AnalysisResponse"
+      },
+      "AnalysisStatusResponse": {
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "title": "Dataset Id"
+          },
+          "ai_configured": {
+            "type": "boolean",
+            "title": "Ai Configured"
+          },
+          "cached": {
+            "type": "boolean",
+            "title": "Cached"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "effort": {
+            "type": "string",
+            "title": "Effort"
+          },
+          "estimated_calls": {
+            "type": "integer",
+            "title": "Estimated Calls"
+          },
+          "detail": {
+            "type": "object",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "ai_configured",
+          "cached",
+          "model",
+          "effort",
+          "estimated_calls"
+        ],
+        "title": "AnalysisStatusResponse"
+      },
+      "AskRequest": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Question",
+            "examples": [
+              "Marji en hizli daralan urun hangisi?"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "question"
+        ],
+        "title": "AskRequest"
+      },
+      "AskResponse": {
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "title": "Dataset Id"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "answer": {
+            "$ref": "#/components/schemas/QAAnswer"
+          },
+          "grounding": {
+            "$ref": "#/components/schemas/GroundingOut"
+          },
+          "telemetry": {
+            "$ref": "#/components/schemas/TelemetryOut"
+          },
+          "cached": {
+            "type": "boolean",
+            "title": "Cached",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "question",
+          "answer",
+          "grounding",
+          "telemetry"
+        ],
+        "title": "AskResponse"
+      },
+      "Body_upload_dataset_api_v1_datasets_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File",
+            "description": "Islenecek CSV dosyasi"
+          },
+          "pack": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack",
+            "description": "Rapor tipi (or. 'sonart-erp'). Bos birakilirsa basliklardan tespit edilir."
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_dataset_api_v1_datasets_post"
+      },
+      "DatasetSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "pack_key": {
+            "type": "string",
+            "title": "Pack Key"
+          },
+          "pack_title": {
+            "type": "string",
+            "title": "Pack Title"
+          },
+          "raw_row_count": {
+            "type": "integer",
+            "title": "Raw Row Count"
+          },
+          "clean_row_count": {
+            "type": "integer",
+            "title": "Clean Row Count"
+          },
+          "quarantined_row_count": {
+            "type": "integer",
+            "title": "Quarantined Row Count"
+          },
+          "health_score": {
+            "type": "integer",
+            "title": "Health Score"
+          },
+          "encoding_detected": {
+            "type": "string",
+            "title": "Encoding Detected"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "filename",
+          "pack_key",
+          "pack_title",
+          "raw_row_count",
+          "clean_row_count",
+          "quarantined_row_count",
+          "health_score",
+          "encoding_detected",
+          "created_at"
+        ],
+        "title": "DatasetSummary"
+      },
+      "EntitiesResponse": {
+        "properties": {
+          "entity_key": {
+            "type": "string",
+            "title": "Entity Key"
+          },
+          "entity_label_key": {
+            "type": "string",
+            "title": "Entity Label Key"
+          },
+          "dimensions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Dimensions"
+          },
+          "columns": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Columns",
+            "description": "Kolon adi/etiket/birim -- tablo basliklarini frontend'e tasir."
+          },
+          "rows": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "series_rows": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Series Rows",
+            "description": "(kayit, donem) bazinda uzun tablo -- kayit detay grafikleri icin."
+          }
+        },
+        "type": "object",
+        "required": [
+          "entity_key",
+          "entity_label_key",
+          "dimensions",
+          "columns",
+          "rows",
+          "series_rows"
+        ],
+        "title": "EntitiesResponse"
+      },
+      "Evidence": {
+        "properties": {
+          "metric": {
+            "type": "string",
+            "title": "Metric",
+            "description": "Metrigin teknik adi, or. 'son_kapama_ay'."
+          },
+          "value": {
+            "type": "number",
+            "title": "Value",
+            "description": "Verilen tablolardaki degerin aynisi."
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit",
+            "description": "Birim: TL, adet, %, ay, oran, sayi."
+          },
+          "entity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity",
+            "description": "Ilgili kayit kodu, or. 'U005'. Portfoy geneli ise bos."
+          },
+          "period": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period",
+            "description": "Donem, or. '2026-03'."
+          }
+        },
+        "type": "object",
+        "required": [
+          "metric",
+          "value",
+          "unit"
+        ],
+        "title": "Evidence",
+        "description": "Bir iddianin dayandigi somut sayi."
+      },
+      "ExecutiveSummary": {
+        "properties": {
+          "headline": {
+            "type": "string",
+            "title": "Headline",
+            "description": "Yonetimin ilk okuyacagi tek cumle."
+          },
+          "situation": {
+            "type": "string",
+            "title": "Situation",
+            "description": "Genel durum: 2-4 cumle, sayiya dayali."
+          },
+          "period_narrative": {
+            "type": "string",
+            "title": "Period Narrative",
+            "description": "Alti donemin hikayesi: nereden nereye gelindi, kirilma noktalari hangi donemlerde yasandi."
+          },
+          "top_risks": {
+            "items": {
+              "$ref": "#/components/schemas/RiskHighlight"
+            },
+            "type": "array",
+            "title": "Top Risks",
+            "description": "En kritik riskler, oncelik sirasiyla."
+          },
+          "opportunities": {
+            "items": {
+              "$ref": "#/components/schemas/RiskHighlight"
+            },
+            "type": "array",
+            "title": "Opportunities",
+            "description": "Degerlendirilmesi gereken firsatlar."
+          },
+          "strategic_actions": {
+            "items": {
+              "$ref": "#/components/schemas/Action"
+            },
+            "type": "array",
+            "title": "Strategic Actions",
+            "description": "Yonetim seviyesinde stratejik aksiyonlar."
+          }
+        },
+        "type": "object",
+        "required": [
+          "headline",
+          "situation",
+          "period_narrative",
+          "top_risks",
+          "strategic_actions"
+        ],
+        "title": "ExecutiveSummary",
+        "description": "Yonetime hitap eden ust duzey sentez."
+      },
+      "GroundingOut": {
+        "properties": {
+          "total_evidence": {
+            "type": "integer",
+            "title": "Total Evidence"
+          },
+          "verified_evidence": {
+            "type": "integer",
+            "title": "Verified Evidence"
+          },
+          "grounding_ratio": {
+            "type": "number",
+            "title": "Grounding Ratio"
+          },
+          "issues": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Issues"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_evidence",
+          "verified_evidence",
+          "grounding_ratio"
+        ],
+        "title": "GroundingOut",
+        "description": "AI ciktisinin ne kadarinin hesaplanmis veriye dayandigi."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MetricOut": {
+        "properties": {
+          "metric": {
+            "type": "string",
+            "title": "Metric"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "entity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity"
+          },
+          "period": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metric",
+          "label",
+          "value",
+          "unit"
+        ],
+        "title": "MetricOut"
+      },
+      "OverviewResponse": {
+        "properties": {
+          "dataset": {
+            "$ref": "#/components/schemas/DatasetSummary"
+          },
+          "periods": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Periods"
+          },
+          "entity_count": {
+            "type": "integer",
+            "title": "Entity Count"
+          },
+          "headline_metrics": {
+            "items": {
+              "$ref": "#/components/schemas/MetricOut"
+            },
+            "type": "array",
+            "title": "Headline Metrics"
+          },
+          "period_rows": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Period Rows",
+            "description": "Donem bazinda portfoy ozeti -- trend grafiklerinin kaynagi."
+          },
+          "risk_counts_by_severity": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Risk Counts By Severity"
+          },
+          "top_risks": {
+            "items": {
+              "$ref": "#/components/schemas/RiskOut"
+            },
+            "type": "array",
+            "title": "Top Risks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dataset",
+          "periods",
+          "entity_count",
+          "headline_metrics",
+          "period_rows",
+          "risk_counts_by_severity",
+          "top_risks"
+        ],
+        "title": "OverviewResponse"
+      },
+      "PackOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "entity_key": {
+            "type": "string",
+            "title": "Entity Key"
+          },
+          "period_key": {
+            "type": "string",
+            "title": "Period Key"
+          },
+          "dimensions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Dimensions"
+          },
+          "required_columns": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Required Columns"
+          },
+          "risk_rule_count": {
+            "type": "integer",
+            "title": "Risk Rule Count"
+          },
+          "metric_count": {
+            "type": "integer",
+            "title": "Metric Count"
+          },
+          "sample_file": {
+            "type": "string",
+            "title": "Sample File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "title",
+          "description",
+          "entity_key",
+          "period_key",
+          "dimensions",
+          "required_columns",
+          "risk_rule_count",
+          "metric_count",
+          "sample_file"
+        ],
+        "title": "PackOut"
+      },
+      "PeriodAnalysis": {
+        "properties": {
+          "period": {
+            "type": "string",
+            "title": "Period"
+          },
+          "headline": {
+            "type": "string",
+            "title": "Headline",
+            "description": "Bu donemi tek cumlede ozetleyen baslik."
+          },
+          "delta_vs_prev": {
+            "type": "string",
+            "title": "Delta Vs Prev",
+            "description": "Bir onceki doneme gore somut olarak ne degisti. Ilk donemde baslangic durumunu tarif et. Genel ifade degil, sayiya dayali fark."
+          },
+          "dominant_dynamics": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Dominant Dynamics",
+            "description": "Bu donemi belirleyen dinamikler (verilen listeden secilir)."
+          },
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/Action"
+            },
+            "type": "array",
+            "title": "Actions",
+            "description": "Bu doneme ozgu aksiyonlar."
+          },
+          "watch_items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Watch Items",
+            "description": "Henuz aksiyon gerektirmeyen ama izlenmesi gerekenler."
+          }
+        },
+        "type": "object",
+        "required": [
+          "period",
+          "headline",
+          "delta_vs_prev",
+          "dominant_dynamics",
+          "actions"
+        ],
+        "title": "PeriodAnalysis",
+        "description": "Tek bir donemin analizi.\n\n`delta_vs_prev` bilerek zorunlu: modelin her donem icin ayni genel metni\nuretmesini engelleyip bir onceki doneme gore *ne degistigini* soylemeye\nmecbur birakir. Donemsel farklilasmanin sema tarafindaki garantisi budur."
+      },
+      "PeriodsResponse": {
+        "properties": {
+          "periods": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Periods"
+          },
+          "rows": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "deltas": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Deltas",
+            "description": "Her donemin bir oncekine gore degisimi ve o donemde acilan riskler."
+          },
+          "dimension_rows": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Dimension Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "periods",
+          "rows",
+          "deltas",
+          "dimension_rows"
+        ],
+        "title": "PeriodsResponse"
+      },
+      "QAAnswer": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "title": "Answer",
+            "description": "Soruya dogrudan, Turkce yanit."
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "type": "array",
+            "title": "Evidence",
+            "description": "Yaniti destekleyen, tablolardan alinmis sayilar."
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "yuksek",
+              "orta",
+              "dusuk"
+            ],
+            "title": "Confidence"
+          },
+          "caveats": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Caveats",
+            "description": "Yanitin sinirlari; veri yetersizse veya soru kapsam disiysa burada belirt."
+          }
+        },
+        "type": "object",
+        "required": [
+          "answer",
+          "confidence"
+        ],
+        "title": "QAAnswer",
+        "description": "Serbest soru-cevap yaniti."
+      },
+      "QualityIssueOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "affected_rows": {
+            "type": "integer",
+            "title": "Affected Rows"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "samples": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Samples"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "severity",
+          "action",
+          "affected_rows",
+          "detail"
+        ],
+        "title": "QualityIssueOut"
+      },
+      "QualityReportOut": {
+        "properties": {
+          "raw_row_count": {
+            "type": "integer",
+            "title": "Raw Row Count"
+          },
+          "clean_row_count": {
+            "type": "integer",
+            "title": "Clean Row Count"
+          },
+          "quarantined_row_count": {
+            "type": "integer",
+            "title": "Quarantined Row Count"
+          },
+          "encoding_detected": {
+            "type": "string",
+            "title": "Encoding Detected"
+          },
+          "encoding_repaired": {
+            "type": "boolean",
+            "title": "Encoding Repaired"
+          },
+          "health_score": {
+            "type": "integer",
+            "title": "Health Score"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/QualityIssueOut"
+            },
+            "type": "array",
+            "title": "Issues"
+          }
+        },
+        "type": "object",
+        "required": [
+          "raw_row_count",
+          "clean_row_count",
+          "quarantined_row_count",
+          "encoding_detected",
+          "encoding_repaired",
+          "health_score",
+          "issues"
+        ],
+        "title": "QualityReportOut"
+      },
+      "RiskHighlight": {
+        "properties": {
+          "entity": {
+            "type": "string",
+            "title": "Entity"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "why_it_matters": {
+            "type": "string",
+            "title": "Why It Matters"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Evidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entity",
+          "title",
+          "why_it_matters",
+          "evidence"
+        ],
+        "title": "RiskHighlight"
+      },
+      "RiskOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "entity": {
+            "type": "string",
+            "title": "Entity"
+          },
+          "entity_label": {
+            "type": "string",
+            "title": "Entity Label"
+          },
+          "dimensions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Dimensions"
+          },
+          "narrative": {
+            "type": "string",
+            "title": "Narrative"
+          },
+          "recommendation": {
+            "type": "string",
+            "title": "Recommendation"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/MetricOut"
+            },
+            "type": "array",
+            "title": "Evidence"
+          },
+          "financial_impact_tl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Financial Impact Tl"
+          },
+          "first_seen_period": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Seen Period"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "severity",
+          "entity",
+          "entity_label",
+          "narrative",
+          "recommendation"
+        ],
+        "title": "RiskOut"
+      },
+      "RisksResponse": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "total_financial_impact_tl": {
+            "type": "number",
+            "title": "Total Financial Impact Tl"
+          },
+          "by_severity": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Severity"
+          },
+          "by_code": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Code"
+          },
+          "risks": {
+            "items": {
+              "$ref": "#/components/schemas/RiskOut"
+            },
+            "type": "array",
+            "title": "Risks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "total_financial_impact_tl",
+          "by_severity",
+          "by_code",
+          "risks"
+        ],
+        "title": "RisksResponse"
+      },
+      "TelemetryOut": {
+        "properties": {
+          "call_count": {
+            "type": "integer",
+            "title": "Call Count",
+            "default": 0
+          },
+          "input_tokens": {
+            "type": "integer",
+            "title": "Input Tokens",
+            "default": 0
+          },
+          "output_tokens": {
+            "type": "integer",
+            "title": "Output Tokens",
+            "default": 0
+          },
+          "cache_write_tokens": {
+            "type": "integer",
+            "title": "Cache Write Tokens",
+            "default": 0
+          },
+          "cache_read_tokens": {
+            "type": "integer",
+            "title": "Cache Read Tokens",
+            "default": 0
+          },
+          "cache_hit_calls": {
+            "type": "integer",
+            "title": "Cache Hit Calls",
+            "default": 0
+          },
+          "total_cost_usd": {
+            "type": "number",
+            "title": "Total Cost Usd",
+            "default": 0.0
+          },
+          "duration_ms": {
+            "type": "integer",
+            "title": "Duration Ms",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "TelemetryOut"
+      },
+      "UploadResponse": {
+        "properties": {
+          "dataset": {
+            "$ref": "#/components/schemas/DatasetSummary"
+          },
+          "quality": {
+            "$ref": "#/components/schemas/QualityReportOut"
+          },
+          "periods": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Periods"
+          },
+          "entity_count": {
+            "type": "integer",
+            "title": "Entity Count"
+          },
+          "risk_count": {
+            "type": "integer",
+            "title": "Risk Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dataset",
+          "quality",
+          "periods",
+          "entity_count",
+          "risk_count"
+        ],
+        "title": "UploadResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
