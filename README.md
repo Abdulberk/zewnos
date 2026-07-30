@@ -745,11 +745,10 @@ alternatifler → neden elendi → ödünler.
 
 | | |
 |---|---|
-| [ADR-001](docs/decisions/ADR-001-track-secimi.md) | Track B seçimi |
-| [ADR-002](docs/decisions/ADR-002-fastapi.md) | FastAPI (Litestar elendi) |
-| [ADR-003](docs/decisions/ADR-003-polars.md) | Polars (pandas elendi) |
-| [ADR-004](docs/decisions/ADR-004-pydantic.md) | Pydantic v2 (msgspec elendi) |
-| [ADR-005](docs/decisions/ADR-005-sqlite.md) | SQLite (DuckDB/Postgres elendi) |
+| [ADR-002](docs/decisions/ADR-002-fastapi.md) | FastAPI  |
+| [ADR-003](docs/decisions/ADR-003-polars.md) | Polars |
+| [ADR-004](docs/decisions/ADR-004-pydantic.md) | Pydantic v2 |
+| [ADR-005](docs/decisions/ADR-005-sqlite.md) | SQLite |
 | [ADR-006](docs/decisions/ADR-006-model-secimi.md) | Claude Opus 5 / Sonnet 5 |
 | [ADR-007](docs/decisions/ADR-007-ai-sayi-hesaplamaz.md) | **AI sayı hesaplamaz** |
 | [ADR-008](docs/decisions/ADR-008-no-orchestration-framework.md) | Orkestrasyon framework'ü kullanılmadı |
