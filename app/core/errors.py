@@ -18,7 +18,7 @@ class AppError(Exception):
 
     code: str = "internal_error"
     http_status: int = 500
-    message: str = "Beklenmeyen bir hata olustu."
+    message: str = "Beklenmeyen bir hata oluştu."
 
     def __init__(
         self,
@@ -40,19 +40,19 @@ class AppError(Exception):
 class NotFoundError(AppError):
     code = "not_found"
     http_status = 404
-    message = "Kayit bulunamadi."
+    message = "Kayıt bulunamadı."
 
 
 class InvalidRequestError(AppError):
     code = "invalid_request"
     http_status = 400
-    message = "Istek gecersiz."
+    message = "İstek geçersiz."
 
 
 class FileTooLargeError(AppError):
     code = "file_too_large"
     http_status = 413
-    message = "Dosya boyutu izin verilen siniri asiyor."
+    message = "Dosya boyutu izin verilen sınırı aşıyor."
 
 
 class UnknownPackError(AppError):
@@ -67,22 +67,22 @@ class UnknownPackError(AppError):
 class IngestionError(AppError):
     code = "ingestion_failed"
     http_status = 422
-    message = "CSV dosyasi islenemedi."
+    message = "CSV dosyası işlenemedi."
 
 
 class EmptyDatasetError(IngestionError):
     code = "empty_dataset"
-    message = "Dosyada islenebilir veri satiri yok."
+    message = "Dosyada işlenebilir veri satırı yok."
 
 
 class SchemaMismatchError(IngestionError):
     code = "schema_mismatch"
-    message = "CSV kolonlari beklenen sema ile uyusmuyor."
+    message = "CSV kolonları beklenen şema ile uyuşmuyor."
 
 
 class UndecodableFileError(IngestionError):
     code = "undecodable_file"
-    message = "Dosya bilinen hicbir karakter kodlamasiyla okunamadi."
+    message = "Dosya bilinen hiçbir karakter kodlamasıyla okunamadı."
 
 
 # --------------------------------------------------------------------------
@@ -91,14 +91,14 @@ class UndecodableFileError(IngestionError):
 class AIError(AppError):
     code = "ai_error"
     http_status = 502
-    message = "AI servisinden yanit alinamadi."
+    message = "AI servisinden yanıt alınamadı."
 
 
 class AINotConfiguredError(AIError):
     code = "ai_not_configured"
     http_status = 503
     message = (
-        "ANTHROPIC_API_KEY tanimli degil. .env dosyasini olusturup anahtari "
+        "ANTHROPIC_API_KEY tanımlı değil. .env dosyasını oluşturup anahtarı "
         "ekledikten sonra tekrar deneyin."
     )
 
@@ -106,14 +106,14 @@ class AINotConfiguredError(AIError):
 class AIRateLimitedError(AIError):
     code = "ai_rate_limited"
     http_status = 429
-    message = "AI servisi istek limitini asti, lutfen biraz sonra tekrar deneyin."
+    message = "AI servisi istek limitini aştı, lütfen biraz sonra tekrar deneyin."
 
 
 class AIResponseInvalidError(AIError):
     code = "ai_response_invalid"
-    message = "AI yaniti beklenen semaya uymadi."
+    message = "AI yanıtı beklenen şemaya uymadı."
 
 
 class AIRefusedError(AIError):
     code = "ai_refused"
-    message = "AI bu istegi guvenlik gerekcesiyle yanitlamadi."
+    message = "AI bu isteği güvenlik gerekçesiyle yanıtlamadı."

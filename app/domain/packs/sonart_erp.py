@@ -50,16 +50,16 @@ def _tl(value: float) -> str:
 # ---------------------------------------------------------------------------
 COLUMNS = (
     ColumnDef("stok_kodu", ("stok kodu", "urun_kodu", "sku"), ColumnType.METIN, True, "Stok Kodu"),
-    ColumnDef("urun_adi", ("urun adi", "malzeme_adi"), ColumnType.METIN, True, "Urun Adi"),
+    ColumnDef("urun_adi", ("urun adi", "malzeme_adi"), ColumnType.METIN, True, "Ürün Adı"),
     ColumnDef("kategori", ("urun_kategorisi",), ColumnType.METIN, True, "Kategori"),
     ColumnDef("depo", ("depo_adi", "ambar"), ColumnType.METIN, True, "Depo"),
-    ColumnDef("donem", ("period", "ay", "donem_kodu"), ColumnType.DONEM, True, "Donem"),
+    ColumnDef("donem", ("period", "ay", "donem_kodu"), ColumnType.DONEM, True, "Dönem"),
     ColumnDef(
         "giris_miktar",
         ("giris", "giris_miktari"),
         ColumnType.ONDALIK,
         True,
-        "Giris",
+        "Giriş",
         MetricUnit.ADET,
     ),
     ColumnDef(
@@ -67,7 +67,7 @@ COLUMNS = (
         ("cikis", "cikis_miktari"),
         ColumnType.ONDALIK,
         True,
-        "Cikis",
+        "Çıkış",
         MetricUnit.ADET,
     ),
     ColumnDef(
@@ -75,7 +75,7 @@ COLUMNS = (
         ("son_stok", "kalan_stok"),
         ColumnType.ONDALIK,
         True,
-        "Donem Sonu Stok",
+        "Dönem Sonu Stok",
         MetricUnit.ADET,
     ),
     ColumnDef(
@@ -91,7 +91,7 @@ COLUMNS = (
         ("birim_satis", "satis_fiyati"),
         ColumnType.ONDALIK,
         True,
-        "Birim Satis Fiyati",
+        "Birim Satış Fiyatı",
         MetricUnit.TL,
     ),
 )
@@ -118,25 +118,25 @@ DERIVED_METRICS = (
         MetricUnit.TL,
         lambda _: pl.col("cikis_miktar") * pl.col("birim_satis_tl"),
         "row",
-        "Donemsel satis geliri (cikis x birim satis fiyati).",
+        "Dönemsel satış geliri (çıkış x birim satış fiyatı).",
     ),
     DerivedMetric(
         "satis_maliyeti_tl",
-        "Satis Maliyeti",
+        "Satış Maliyeti",
         MetricUnit.TL,
         lambda _: pl.col("cikis_miktar") * pl.col("birim_maliyet_tl"),
         "row",
     ),
     DerivedMetric(
         "brut_kar_tl",
-        "Brut Kar",
+        "Brüt Kâr",
         MetricUnit.TL,
         lambda _: pl.col("cikis_miktar") * (pl.col("birim_satis_tl") - pl.col("birim_maliyet_tl")),
         "row",
     ),
     DerivedMetric(
         "marj_yuzde",
-        "Brut Marj",
+        "Brüt Marj",
         MetricUnit.YUZDE,
         lambda _: pl.when(pl.col("birim_satis_tl") > 0)
         .then(
@@ -144,19 +144,19 @@ DERIVED_METRICS = (
         )
         .otherwise(None),
         "row",
-        "Birim bazinda brut kar yuzdesi.",
+        "Birim bazında brüt kâr yüzdesi.",
     ),
     DerivedMetric(
         "stok_degeri_tl",
-        "Stok Degeri",
+        "Stok Değeri",
         MetricUnit.TL,
         lambda _: pl.col("donem_sonu_stok") * pl.col("birim_maliyet_tl"),
         "row",
-        "Donem sonunda depoda bagli sermaye.",
+        "Dönem sonunda depoda bağlı sermaye.",
     ),
     DerivedMetric(
         "net_akis",
-        "Net Stok Akisi",
+        "Net Stok Akışı",
         MetricUnit.ADET,
         lambda _: pl.col("giris_miktar") - pl.col("cikis_miktar"),
         "row",
@@ -164,14 +164,14 @@ DERIVED_METRICS = (
     # --- pencere (entity bazli) ---
     DerivedMetric(
         "onceki_stok",
-        "Onceki Donem Stogu",
+        "Önceki Dönem Stoğu",
         MetricUnit.ADET,
         lambda ctx: pl.col("donem_sonu_stok").shift(1).over(ctx.entity_key),
         "window",
     ),
     DerivedMetric(
         "cikis_ort3",
-        "Cikis (3 Donem Ort.)",
+        "Çıkış (3 Dönem Ort.)",
         MetricUnit.ADET,
         lambda ctx: pl.col("cikis_miktar")
         .rolling_mean(window_size=3, min_periods=1)
@@ -180,29 +180,29 @@ DERIVED_METRICS = (
     ),
     DerivedMetric(
         "cikis_mom_yuzde",
-        "Cikis Degisimi (Aylik)",
+        "Çıkış Değişimi (Aylık)",
         MetricUnit.YUZDE,
         lambda ctx: (pl.col("cikis_miktar").pct_change().over(ctx.entity_key) * 100),
         "window",
     ),
     DerivedMetric(
         "maliyet_mom_yuzde",
-        "Birim Maliyet Degisimi (Aylik)",
+        "Birim Maliyet Değişimi (Aylık)",
         MetricUnit.YUZDE,
         lambda ctx: (pl.col("birim_maliyet_tl").pct_change().over(ctx.entity_key) * 100),
         "window",
     ),
     DerivedMetric(
         "marj_delta_puan",
-        "Marj Degisimi (Puan)",
+        "Marj Değişimi (Puan)",
         MetricUnit.YUZDE,
         lambda ctx: pl.col("marj_yuzde") - pl.col("marj_yuzde").shift(1).over(ctx.entity_key),
         "window",
     ),
-    DerivedMetric("kapama_ay", "Stok Kapama Suresi", MetricUnit.AY, _kapama_ay, "window"),
+    DerivedMetric("kapama_ay", "Stok Kapama Süresi", MetricUnit.AY, _kapama_ay, "window"),
     DerivedMetric(
         "mutabakat_farki",
-        "Stok Mutabakat Farki",
+        "Stok Mutabakat Farkı",
         MetricUnit.ADET,
         lambda ctx: pl.col("donem_sonu_stok")
         - (
@@ -211,17 +211,17 @@ DERIVED_METRICS = (
             - pl.col("cikis_miktar")
         ),
         "window",
-        "Beklenen donem sonu stogu ile raporlanan arasindaki fark.",
+        "Beklenen dönem sonu stoğu ile raporlanan arasındaki fark.",
     ),
     DerivedMetric(
         "arz_kisitli",
-        "Arz Kisitli",
+        "Arz Kısıtlı",
         MetricUnit.SAYI,
         lambda _: (
             (pl.col("donem_sonu_stok") <= 0) & (pl.col("cikis_miktar") <= pl.col("giris_miktar"))
         ).cast(pl.Int8),
         "row",
-        "Stok sifir ve cikis girise kilitli: satis talep degil, tedarik belirliyor.",
+        "Stok sıfır ve çıkış girişe kilitli: satış talep değil, tedarik belirliyor.",
     ),
 )
 
@@ -232,24 +232,24 @@ DERIVED_METRICS = (
 IMPUTATION_RULES = (
     ImputationRule(
         code="IMPUTED_FLOW",
-        title="Eksik giris/cikis miktarlari urunun kendi ortancasindan tamamlandi",
+        title="Eksik giriş/çıkış miktarları ürünün kendi ortancasından tamamlandı",
         target_column="giris_miktar",
         forward=lambda ctx: pl.col("giris_miktar").median().over(ctx.entity_key),
         detail=(
-            "Eksik giris miktari, ayni urunun diger donemlerindeki ortanca degerle "
-            "dolduruldu. Ortalama yerine ortanca: tek bir uc deger tahmini bozmasin."
+            "Eksik giriş miktarı, aynı ürünün diğer dönemlerindeki ortanca değerle "
+            "dolduruldu. Ortalama yerine ortanca: tek bir uç değer tahmini bozmasın."
         ),
     ),
     ImputationRule(
         code="IMPUTED_FLOW",
-        title="Eksik cikis miktarlari urunun kendi ortancasindan tamamlandi",
+        title="Eksik çıkış miktarları ürünün kendi ortancasından tamamlandı",
         target_column="cikis_miktar",
         forward=lambda ctx: pl.col("cikis_miktar").median().over(ctx.entity_key),
-        detail="Eksik cikis miktari ayni urunun donemler arasi ortanca degeriyle dolduruldu.",
+        detail="Eksik çıkış miktarı aynı ürünün dönemler arası ortanca değeriyle dolduruldu.",
     ),
     ImputationRule(
         code="IMPUTED_STOCK",
-        title="Eksik donem sonu stogu mutabakattan turetildi",
+        title="Eksik dönem sonu stoğu mutabakattan türetildi",
         target_column="donem_sonu_stok",
         # ileri: onceki donem sonu + giris - cikis
         forward=lambda ctx: (
@@ -264,9 +264,9 @@ IMPUTATION_RULES = (
             + pl.col("cikis_miktar").shift(-1).over(ctx.entity_key)
         ),
         detail=(
-            "Bos birakilan donem sonu stogu, stok mutabakati denkleminden hesaplandi: "
-            "onceki donem sonu + giris - cikis. Ayni deger bir de sonraki donemden "
-            "geriye dogru dogrulandi."
+            "Boş bırakılan dönem sonu stoğu, stok mutabakatı denkleminden hesaplandı: "
+            "önceki dönem sonu + giriş - çıkış. Aynı değer bir de sonraki dönemden "
+            "geriye doğru doğrulandı."
         ),
     ),
 )
@@ -278,16 +278,16 @@ IMPUTATION_RULES = (
 INTEGRITY_RULES = (
     IntegrityRule(
         code="RECONCILIATION_BREAK",
-        title="Stok mutabakati tutmuyor",
+        title="Stok mutabakatı tutmuyor",
         severity=Severity.YUKSEK,
         action=IssueAction.ISARETLENDI,
         violation=lambda ctx: (
             pl.col("onceki_stok").is_not_null() & (pl.col("mutabakat_farki").abs() > 0.5)
         ),
         detail_template=(
-            "{count} kayitta 'onceki donem sonu + giris - cikis' hesabi raporlanan "
-            "donem sonu stoguyla ortusmuyor. Kaynak sistemde sayim duzeltmesi, fire "
-            "veya kayit atlamasi olabilir."
+            "{count} kayıtta 'önceki dönem sonu + giriş - çıkış' hesabı raporlanan "
+            "dönem sonu stoğuyla örtüşmüyor. Kaynak sistemde sayım düzeltmesi, fire "
+            "veya kayıt atlaması olabilir."
         ),
         sample_columns=("stok_kodu", "donem", "mutabakat_farki"),
     ),
@@ -301,16 +301,16 @@ INTEGRITY_RULES = (
             | (pl.col("cikis_miktar") < 0)
             | (pl.col("donem_sonu_stok") < 0)
         ),
-        detail_template="{count} kayitta negatif miktar var; fiziksel olarak mumkun degil.",
+        detail_template="{count} kayıtta negatif miktar var; fiziksel olarak mümkün değil.",
         sample_columns=("stok_kodu", "donem", "donem_sonu_stok"),
     ),
     IntegrityRule(
         code="MARGIN_INVERSION",
-        title="Maliyet satis fiyatina esit ya da ustunde",
+        title="Maliyet satış fiyatına eşit ya da üstünde",
         severity=Severity.KRITIK,
         action=IssueAction.ISARETLENDI,
         violation=lambda _: pl.col("birim_maliyet_tl") >= pl.col("birim_satis_tl"),
-        detail_template="{count} kayitta urun maliyetine esit ya da altinda satiliyor.",
+        detail_template="{count} kayıtta ürün maliyetine eşit ya da altında satılıyor.",
         sample_columns=("stok_kodu", "donem", "birim_maliyet_tl", "birim_satis_tl"),
     ),
     IntegrityRule(
@@ -320,9 +320,9 @@ INTEGRITY_RULES = (
         action=IssueAction.ISARETLENDI,
         violation=lambda _: pl.col("maliyet_mom_yuzde") > MALIYET_SOK_YUZDE,
         detail_template=(
-            f"{{count}} kayitta birim maliyet bir onceki doneme gore %{MALIYET_SOK_YUZDE:.0f} "
-            "uzerinde artti. Tedarikci fiyat guncellemesi veya kur etkisi olabilir; "
-            "satis fiyati ayni kaldiysa marj dogrudan eriyor."
+            f"{{count}} kayıtta birim maliyet bir önceki döneme göre %{MALIYET_SOK_YUZDE:.0f} "
+            "üzerinde arttı. Tedarikçi fiyat güncellemesi veya kur etkisi olabilir; "
+            "satış fiyatı aynı kaldıysa marj doğrudan eriyor."
         ),
         sample_columns=("stok_kodu", "donem", "maliyet_mom_yuzde"),
     ),
@@ -338,14 +338,14 @@ PERIOD_AGGREGATES = (
     ),
     Aggregate(
         "toplam_brut_kar_tl",
-        "Brut Kar",
+        "Brüt Kâr",
         MetricUnit.TL,
         lambda _: pl.col("brut_kar_tl").sum(),
         True,
     ),
     Aggregate(
         "ortalama_marj_yuzde",
-        "Agirlikli Marj",
+        "Ağırlıklı Marj",
         MetricUnit.YUZDE,
         lambda _: pl.when(pl.col("ciro_tl").sum() > 0)
         .then(pl.col("brut_kar_tl").sum() / pl.col("ciro_tl").sum() * 100)
@@ -354,23 +354,23 @@ PERIOD_AGGREGATES = (
     ),
     Aggregate(
         "toplam_stok_degeri_tl",
-        "Stokta Bagli Sermaye",
+        "Stokta Bağlı Sermaye",
         MetricUnit.TL,
         lambda _: pl.col("stok_degeri_tl").sum(),
         True,
     ),
     Aggregate(
         "tukenen_urun_sayisi",
-        "Stogu Tukenen Urun",
+        "Stoğu Tükenen Ürün",
         MetricUnit.SAYI,
         lambda _: (pl.col("donem_sonu_stok") <= 0).sum(),
         True,
     ),
     Aggregate(
-        "toplam_cikis", "Toplam Cikis", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").sum()
+        "toplam_cikis", "Toplam Çıkış", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").sum()
     ),
     Aggregate(
-        "toplam_giris", "Toplam Giris", MetricUnit.ADET, lambda _: pl.col("giris_miktar").sum()
+        "toplam_giris", "Toplam Giriş", MetricUnit.ADET, lambda _: pl.col("giris_miktar").sum()
     ),
     Aggregate(
         "toplam_stok_adet",
@@ -384,20 +384,20 @@ PERIOD_AGGREGATES = (
 ENTITY_AGGREGATES = (
     Aggregate("toplam_ciro_tl", "Toplam Ciro", MetricUnit.TL, lambda _: pl.col("ciro_tl").sum()),
     Aggregate(
-        "toplam_brut_kar_tl", "Brut Kar", MetricUnit.TL, lambda _: pl.col("brut_kar_tl").sum()
+        "toplam_brut_kar_tl", "Brüt Kâr", MetricUnit.TL, lambda _: pl.col("brut_kar_tl").sum()
     ),
     Aggregate("son_stok", "Son Stok", MetricUnit.ADET, lambda _: pl.col("donem_sonu_stok").last()),
-    Aggregate("ilk_stok", "Ilk Stok", MetricUnit.ADET, lambda _: pl.col("donem_sonu_stok").first()),
+    Aggregate("ilk_stok", "İlk Stok", MetricUnit.ADET, lambda _: pl.col("donem_sonu_stok").first()),
     Aggregate("son_kapama_ay", "Stok Kapama", MetricUnit.AY, lambda _: pl.col("kapama_ay").last()),
     Aggregate(
         "son_marj_yuzde", "Son Marj", MetricUnit.YUZDE, lambda _: pl.col("marj_yuzde").last()
     ),
     Aggregate(
-        "ilk_marj_yuzde", "Ilk Marj", MetricUnit.YUZDE, lambda _: pl.col("marj_yuzde").first()
+        "ilk_marj_yuzde", "İlk Marj", MetricUnit.YUZDE, lambda _: pl.col("marj_yuzde").first()
     ),
     Aggregate(
         "marj_degisim_puan",
-        "Marj Degisimi",
+        "Marj Değişimi",
         MetricUnit.YUZDE,
         lambda _: pl.col("marj_yuzde").last() - pl.col("marj_yuzde").first(),
     ),
@@ -409,7 +409,7 @@ ENTITY_AGGREGATES = (
     ),
     Aggregate(
         "maliyet_degisim_yuzde",
-        "Maliyet Degisimi",
+        "Maliyet Değişimi",
         MetricUnit.YUZDE,
         lambda _: pl.when(pl.col("birim_maliyet_tl").first() > 0)
         .then(
@@ -421,72 +421,72 @@ ENTITY_AGGREGATES = (
     ),
     Aggregate(
         "son_birim_satis",
-        "Son Satis Fiyati",
+        "Son Satış Fiyatı",
         MetricUnit.TL,
         lambda _: pl.col("birim_satis_tl").last(),
     ),
     Aggregate(
         "son_stok_degeri_tl",
-        "Bagli Sermaye",
+        "Bağlı Sermaye",
         MetricUnit.TL,
         lambda _: pl.col("stok_degeri_tl").last(),
     ),
     Aggregate(
         "sifir_stok_donem",
-        "Stoksuz Donem Sayisi",
+        "Stoksuz Dönem Sayısı",
         MetricUnit.SAYI,
         lambda _: (pl.col("donem_sonu_stok") <= 0).sum(),
     ),
     Aggregate(
         "ilk_sifir_donem",
-        "Ilk Stoksuz Donem",
+        "İlk Stoksuz Dönem",
         MetricUnit.SAYI,
         lambda ctx: pl.col(ctx.period_key).filter(pl.col("donem_sonu_stok") <= 0).first(),
         internal=True,
     ),
     Aggregate(
         "arz_kisitli_donem",
-        "Arz Kisitli Donem",
+        "Arz Kısıtlı Dönem",
         MetricUnit.SAYI,
         lambda _: pl.col("arz_kisitli").sum(),
     ),
     Aggregate(
-        "ilk_cikis", "Ilk Donem Cikis", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").first()
+        "ilk_cikis", "İlk Dönem Çıkış", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").first()
     ),
     Aggregate(
-        "son_cikis", "Son Donem Cikis", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").last()
+        "son_cikis", "Son Dönem Çıkış", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").last()
     ),
     Aggregate(
-        "ortalama_cikis", "Ortalama Cikis", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").mean()
+        "ortalama_cikis", "Ortalama Çıkış", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").mean()
     ),
     Aggregate(
         "ilk3_cikis_ort",
-        "Ilk 3 Donem Ort. Cikis",
+        "İlk 3 Dönem Ort. Çıkış",
         MetricUnit.ADET,
         lambda _: pl.col("cikis_miktar").head(3).mean(),
     ),
     Aggregate(
         "son3_cikis_ort",
-        "Son 3 Donem Ort. Cikis",
+        "Son 3 Dönem Ort. Çıkış",
         MetricUnit.ADET,
         lambda _: pl.col("cikis_miktar").tail(3).mean(),
     ),
     Aggregate(
-        "zirve_cikis", "Zirve Cikis", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").max()
+        "zirve_cikis", "Zirve Çıkış", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").max()
     ),
     Aggregate(
         "zirve_donem",
-        "Zirve Donemi",
+        "Zirve Dönemi",
         MetricUnit.SAYI,
         lambda ctx: pl.col(ctx.period_key).sort_by("cikis_miktar", descending=True).first(),
         internal=True,
     ),
     Aggregate(
-        "net_akis_toplam", "Net Stok Akisi", MetricUnit.ADET, lambda _: pl.col("net_akis").sum()
+        "net_akis_toplam", "Net Stok Akışı", MetricUnit.ADET, lambda _: pl.col("net_akis").sum()
     ),
     Aggregate(
         "stok_trend_step",
-        "Stok Egilimi (Donem Basi)",
+        "Stok Eğilimi (Dönem Başı)",
         MetricUnit.ADET,
         lambda _: pl.when(pl.len() > 1)
         .then(
@@ -496,7 +496,7 @@ ENTITY_AGGREGATES = (
     ),
     Aggregate(
         "cikis_trend_step",
-        "Cikis Egilimi (Donem Basi)",
+        "Çıkış Eğilimi (Dönem Başı)",
         MetricUnit.ADET,
         lambda _: pl.when(pl.len() > 1)
         .then((pl.col("cikis_miktar").last() - pl.col("cikis_miktar").first()) / (pl.len() - 1))
@@ -508,7 +508,7 @@ ENTITY_AGGREGATES = (
     # boylece dashboard "bu ay hangi risk ortaya cikti" diyebilir.
     Aggregate(
         "maliyet_sok_donem",
-        "Maliyet Sokunun Yasandigi Donem",
+        "Maliyet Şokunun Yaşandığı Dönem",
         MetricUnit.SAYI,
         lambda ctx: pl.col(ctx.period_key)
         .filter(pl.col("maliyet_mom_yuzde") > MALIYET_SOK_YUZDE)
@@ -517,14 +517,14 @@ ENTITY_AGGREGATES = (
     ),
     Aggregate(
         "marj_dusus_donem",
-        "Marjin Dustugu Donem",
+        "Marjın Düştüğü Dönem",
         MetricUnit.SAYI,
         lambda ctx: pl.col(ctx.period_key).filter(pl.col("marj_delta_puan") < -3.0).first(),
         internal=True,
     ),
     Aggregate(
         "kritik_kapama_donem",
-        "Kritik Kapamaya Dusulen Donem",
+        "Kritik Kapamaya Düşülen Dönem",
         MetricUnit.SAYI,
         lambda ctx: pl.col(ctx.period_key)
         .filter((pl.col("kapama_ay") < KAPAMA_KRITIK_AY) & (pl.col("donem_sonu_stok") > 0))
@@ -533,21 +533,21 @@ ENTITY_AGGREGATES = (
     ),
     Aggregate(
         "olu_stok_donem",
-        "Olu Stoga Gecilen Donem",
+        "Ölü Stoğa Geçilen Dönem",
         MetricUnit.SAYI,
         lambda ctx: pl.col(ctx.period_key).filter(pl.col("kapama_ay") > KAPAMA_OLU_AY).first(),
         internal=True,
     ),
     Aggregate(
         "yavas_donem",
-        "Yavaslamanin Basladigi Donem",
+        "Yavaşlamanın Başladığı Dönem",
         MetricUnit.SAYI,
         lambda ctx: pl.col(ctx.period_key).filter(pl.col("kapama_ay") >= KAPAMA_YAVAS_AY).first(),
         internal=True,
     ),
     Aggregate(
         "talep_patlama_donem",
-        "Talebin Hizlandigi Donem",
+        "Talebin Hızlandığı Dönem",
         MetricUnit.SAYI,
         lambda ctx: pl.col(ctx.period_key)
         .filter(
@@ -562,7 +562,7 @@ ENTITY_AGGREGATES = (
 DIMENSION_AGGREGATES = (
     Aggregate("toplam_ciro_tl", "Ciro", MetricUnit.TL, lambda _: pl.col("ciro_tl").sum()),
     Aggregate(
-        "toplam_brut_kar_tl", "Brut Kar", MetricUnit.TL, lambda _: pl.col("brut_kar_tl").sum()
+        "toplam_brut_kar_tl", "Brüt Kâr", MetricUnit.TL, lambda _: pl.col("brut_kar_tl").sum()
     ),
     Aggregate(
         "ortalama_marj_yuzde",
@@ -574,13 +574,13 @@ DIMENSION_AGGREGATES = (
     ),
     Aggregate(
         "toplam_stok_degeri_tl",
-        "Stok Degeri",
+        "Stok Değeri",
         MetricUnit.TL,
         lambda _: pl.col("stok_degeri_tl").sum(),
     ),
-    Aggregate("toplam_cikis", "Cikis", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").sum()),
+    Aggregate("toplam_cikis", "Çıkış", MetricUnit.ADET, lambda _: pl.col("cikis_miktar").sum()),
     Aggregate(
-        "urun_sayisi", "Urun Sayisi", MetricUnit.SAYI, lambda _: pl.col("stok_kodu").n_unique()
+        "urun_sayisi", "Ürün Sayısı", MetricUnit.SAYI, lambda _: pl.col("stok_kodu").n_unique()
     ),
 )
 
@@ -594,13 +594,13 @@ def _stockout_narrative(row: RowMapping) -> str:
     ilk = row.get("ilk_cikis")
     son = row.get("son_cikis")
     metin = (
-        f"{donem} donemdir stok sifir. Bu donemlerin {kisitli} tanesinde cikis "
-        "girise kilitlenmis durumda -- yani satisi talep degil tedarik belirliyor."
+        f"{donem} dönemdir stok sıfır. Bu dönemlerin {kisitli} tanesinde çıkış "
+        "girişe kilitlenmiş durumda -- yani satışı talep değil tedarik belirliyor."
     )
     if ilk and son and ilk > son:
         metin += (
-            f" Tukenmeden onceki donemsel cikis {ilk:.0f} adetken simdi {son:.0f} adete "
-            "dusmus; aradaki fark kacirilan satis."
+            f" Tükenmeden önceki dönemsel çıkış {ilk:.0f} adetken simdi {son:.0f} adete "
+            "düşmüş; aradaki fark kaçırılan satış."
         )
     return metin
 
@@ -632,14 +632,14 @@ def _stockout_impact(row: RowMapping) -> float | None:
 RISK_RULES = (
     RiskRule(
         code="STOCKOUT",
-        title="Stok tukenmis -- satis tedarikle sinirli",
+        title="Stok tükenmiş -- satış tedarikle sınırlı",
         severity=Severity.KRITIK,
         predicate=lambda _: (pl.col("son_stok") <= 0) & (pl.col("sifir_stok_donem") >= 2),
         narrative=_stockout_narrative,
         recommendation=(
-            "Tedarik siparisini acil buyutun. Bu urun karli ve talep var; kisit "
-            "tarafinizda. Tedarikci teslim suresini ve minimum siparis miktarini "
-            "gozden gecirin."
+            "Tedarik siparişini acil büyütün. Bu ürün kârlı ve talep var; kısıt "
+            "tarafınızda. Tedarikçi teslim süresini ve minimum sipariş miktarını "
+            "gözden geçirin."
         ),
         evidence_metrics=(
             "son_stok",
@@ -654,19 +654,19 @@ RISK_RULES = (
     ),
     RiskRule(
         code="STOCKOUT_IMMINENT",
-        title="Stok tukenmesine cok az kaldi",
+        title="Stok tükenmesine çok az kaldı",
         severity=Severity.YUKSEK,
         predicate=lambda _: (pl.col("son_stok") > 0)
         & (pl.col("son_kapama_ay").is_not_null())
         & (pl.col("son_kapama_ay") < KAPAMA_KRITIK_AY),
         narrative=lambda row: (
-            f"Mevcut stok son 3 donemin cikis hizina gore yalnizca "
-            f"{_num(row, 'son_kapama_ay'):.1f} ay yetiyor. Bu hizla devam ederse "
-            "onumuzdeki donem icinde tukenir."
+            f"Mevcut stok son 3 dönemin çıkış hızına göre yalnızca "
+            f"{_num(row, 'son_kapama_ay'):.1f} ay yetiyor. Bu hızla devam ederse "
+            "önümüzdeki dönem içinde tükenir."
         ),
         recommendation=(
-            "Siparis acin; tedarik suresi kapama suresinden uzunsa simdiden gec "
-            "kalinmis demektir."
+            "Sipariş açın; tedarik süresi kapama süresinden uzunsa şimdiden geç "
+            "kalınmış demektir."
         ),
         evidence_metrics=("son_stok", "son_kapama_ay", "son3_cikis_ort", "son_marj_yuzde"),
         impact=lambda row: _num(row, "son3_cikis_ort") * _num(row, "son_birim_satis"),
@@ -674,17 +674,17 @@ RISK_RULES = (
     ),
     RiskRule(
         code="DEAD_STOCK",
-        title="Olu stok -- sermaye bagli",
+        title="Ölü stok -- sermaye bağlı",
         severity=Severity.YUKSEK,
         predicate=lambda _: pl.col("son_kapama_ay") > KAPAMA_OLU_AY,
         narrative=lambda row: (
-            f"Depoda {_num(row, 'son_stok'):.0f} adet var ve mevcut cikis hiziyla "
+            f"Depoda {_num(row, 'son_stok'):.0f} adet var ve mevcut çıkış hızıyla "
             f"{_num(row, 'son_kapama_ay'):.1f} ay yetiyor. "
-            f"{_tl(_num(row, 'son_stok_degeri_tl'))} sermaye bu urunde bagli duruyor."
+            f"{_tl(_num(row, 'son_stok_degeri_tl'))} sermaye bu üründe bağlı duruyor."
         ),
         recommendation=(
-            "Yeni alimi durdurun. Kampanya, paket satis veya kanal degisikligiyle "
-            "stogu eritmeyi degerlendirin."
+            "Yeni alımı durdurun. Kampanya, paket satış veya kanal değişikliğiyle "
+            "stoğu eritmeyi değerlendirin."
         ),
         evidence_metrics=("son_stok", "son_kapama_ay", "son_stok_degeri_tl", "ortalama_cikis"),
         impact=lambda row: _num(row, "son_stok_degeri_tl"),
@@ -692,16 +692,16 @@ RISK_RULES = (
     ),
     RiskRule(
         code="SLOW_MOVER",
-        title="Yavas hareket eden urun",
+        title="Yavaş hareket eden ürün",
         severity=Severity.ORTA,
         predicate=lambda _: (pl.col("son_kapama_ay") >= KAPAMA_YAVAS_AY)
         & (pl.col("son_kapama_ay") <= KAPAMA_OLU_AY),
         narrative=lambda row: (
-            f"Stok kapama suresi {_num(row, 'son_kapama_ay'):.1f} ay. Kritik degil ama "
-            f"{_tl(_num(row, 'son_stok_degeri_tl'))} sermaye ortalamanin uzerinde bir "
-            "sure depoda bekliyor."
+            f"Stok kapama süresi {_num(row, 'son_kapama_ay'):.1f} ay. Kritik değil ama "
+            f"{_tl(_num(row, 'son_stok_degeri_tl'))} sermaye ortalamanın üzerinde bir "
+            "süre depoda bekliyor."
         ),
-        recommendation="Siparis miktarini kucultup frekansi artirin; bagli sermaye duser.",
+        recommendation="Sipariş miktarını küçültüp frekansı artırın; bağlı sermaye düşer.",
         evidence_metrics=("son_kapama_ay", "son_stok", "son_stok_degeri_tl"),
         impact=lambda row: _num(row, "son_stok_degeri_tl") * 0.5,
         first_seen=_onset("yavas_donem"),
@@ -712,15 +712,15 @@ RISK_RULES = (
         severity=Severity.KRITIK,
         predicate=lambda _: pl.col("marj_degisim_puan") < -MARJ_EROZYON_PUAN,
         narrative=lambda row: (
-            f"Brut marj %{_num(row, 'ilk_marj_yuzde'):.1f} seviyesinden "
+            f"Brüt marj %{_num(row, 'ilk_marj_yuzde'):.1f} seviyesinden "
             f"%{_num(row, 'son_marj_yuzde'):.1f} seviyesine geriledi "
-            f"({_num(row, 'marj_degisim_puan'):.1f} puan). Ayni donemde birim maliyet "
-            f"%{_num(row, 'maliyet_degisim_yuzde'):.1f} degisti; satis fiyati bu artisi "
-            "karsilamamis."
+            f"({_num(row, 'marj_degisim_puan'):.1f} puan). Aynı dönemde birim maliyet "
+            f"%{_num(row, 'maliyet_degisim_yuzde'):.1f} değişti; satış fiyatı bu artışı "
+            "karşılamamış."
         ),
         recommendation=(
-            "Satis fiyatini guncelleyin ya da tedarikci ile fiyat gorusmesi acin. "
-            "Ikisi de mumkun degilse urunun portfoydeki yerini sorgulayin."
+            "Satış fiyatını güncelleyin ya da tedarikçi ile fiyat görüşmesi açın. "
+            "İkisi de mümkün değilse ürünün portföydeki yerini sorgulayın."
         ),
         evidence_metrics=(
             "ilk_marj_yuzde",
@@ -737,16 +737,15 @@ RISK_RULES = (
     ),
     RiskRule(
         code="COST_SHOCK",
-        title="Birim maliyet kalici olarak yukseldi",
+        title="Birim maliyet kalıcı olarak yükseldi",
         severity=Severity.YUKSEK,
         predicate=lambda _: pl.col("maliyet_degisim_yuzde") > MALIYET_SOK_YUZDE,
         narrative=lambda row: (
-            f"Birim maliyet donem basindan bu yana %{_num(row, 'maliyet_degisim_yuzde'):.1f} "
+            f"Birim maliyet dönem başından bu yana %{_num(row, 'maliyet_degisim_yuzde'):.1f} "
             f"artti ve {_num(row, 'son_birim_maliyet'):.0f} TL seviyesine oturdu."
         ),
         recommendation=(
-            "Fiyat listesini gozden gecirin; maliyet artisi kalici ise fiyata "
-            "yansitilmali."
+            "Fiyat listesini gözden geçirin; maliyet artışı kalıcı ise fiyata " "yansıtılmalı."
         ),
         evidence_metrics=("maliyet_degisim_yuzde", "son_birim_maliyet", "son_marj_yuzde"),
         impact=None,
@@ -760,12 +759,12 @@ RISK_RULES = (
         & (pl.col("net_akis_toplam") > 0)
         & (pl.col("cikis_trend_step") <= 0),
         narrative=lambda row: (
-            f"Her donem ortalama {_num(row, 'stok_trend_step'):.0f} adet stok birikiyor: "
-            f"giris cikisi asiyor ve talep artmiyor. Tek bir donem alarma gecmiyor ama "
+            f"Her dönem ortalama {_num(row, 'stok_trend_step'):.0f} adet stok birikiyor: "
+            f"giriş çıkışı aşıyor ve talep artmıyor. Tek bir dönem alarma geçmiyor ama "
             f"trend {_num(row, 'ilk_stok'):.0f} adetten {_num(row, 'son_stok'):.0f} adete "
             "cikmis durumda."
         ),
-        recommendation="Siparis miktarini cikis hizina esitleyin; aksi halde olu stoga donusur.",
+        recommendation="Sipariş miktarını çıkış hızına eşitleyin; aksi halde ölü stoğa dönüşür.",
         evidence_metrics=("stok_trend_step", "net_akis_toplam", "ilk_stok", "son_stok"),
         impact=lambda row: _num(row, "stok_trend_step")
         * _num(row, "periods_count")
@@ -780,11 +779,11 @@ RISK_RULES = (
         & (pl.col("ilk3_cikis_ort") > 0)
         & (pl.col("son3_cikis_ort") > pl.col("ilk3_cikis_ort") * TALEP_PATLAMASI_KAT),
         narrative=lambda row: (
-            f"Donemsel cikis ilk 3 ayda ortalama {_num(row, 'ilk3_cikis_ort'):.0f} adetken "
-            f"son 3 ayda {_num(row, 'son3_cikis_ort'):.0f} adete cikti. Bu bir firsat, "
-            "ama stok bu hiza hazir degilse tukenme riski de beraberinde geliyor."
+            f"Dönemsel çıkış ilk 3 ayda ortalama {_num(row, 'ilk3_cikis_ort'):.0f} adetken "
+            f"son 3 ayda {_num(row, 'son3_cikis_ort'):.0f} adete çıktı. Bu bir fırsat, "
+            "ama stok bu hıza hazır değilse tükenme riski de beraberinde geliyor."
         ),
-        recommendation="Tedarik planini yukari revize edin; buyume trendini stoksuzluk kesmesin.",
+        recommendation="Tedarik planını yukarı revize edin; büyüme trendini stoksuzluk kesmesin.",
         evidence_metrics=("ilk3_cikis_ort", "son3_cikis_ort", "son_stok", "son_kapama_ay"),
         impact=lambda row: (_num(row, "son3_cikis_ort") - _num(row, "ilk3_cikis_ort"))
         * _num(row, "son_birim_satis"),
@@ -799,27 +798,27 @@ RISK_RULES = (
         & (pl.col("ortalama_cikis") > 0)
         & (pl.col("zirve_cikis") > pl.col("ortalama_cikis") * 1.2),
         narrative=lambda row: (
-            f"Cikis {row.get('zirve_donem')} doneminde {_num(row, 'zirve_cikis'):.0f} adetle "
-            f"zirve yapti; donem ortalamasi {_num(row, 'ortalama_cikis'):.0f} adet. "
-            "Duz bir trend degil, mevsimsel bir hareket var."
+            f"Çıkış {row.get('zirve_donem')} doneminde {_num(row, 'zirve_cikis'):.0f} adetle "
+            f"zirve yaptı; dönem ortalaması {_num(row, 'ortalama_cikis'):.0f} adet. "
+            "Düz bir trend değil, mevsimsel bir hareket var."
         ),
-        recommendation="Gelecek yil ayni donem icin stogu onceden planlayin.",
+        recommendation="Gelecek yıl aynı dönem için stoğu önceden planlayın.",
         evidence_metrics=("zirve_cikis", "ortalama_cikis", "son_stok"),
         impact=None,
         first_seen=lambda row: row.get("zirve_donem"),
     ),
     RiskRule(
         code="DYING_SKU",
-        title="Sonumlenen urun",
+        title="Sönümlenen ürün",
         severity=Severity.DUSUK,
         predicate=lambda _: (pl.col("cikis_trend_step") < 0)
         & (pl.col("ortalama_cikis") < 20)
         & (pl.col("son_stok") > 0),
         narrative=lambda row: (
-            f"Donemsel cikis {_num(row, 'ilk_cikis'):.0f} adetten {_num(row, 'son_cikis'):.0f} "
-            "adete geriledi ve hacim zaten dusuk. Urun portfoyde yer kaplamaya devam ediyor."
+            f"Dönemsel çıkış {_num(row, 'ilk_cikis'):.0f} adetten {_num(row, 'son_cikis'):.0f} "
+            "adete geriledi ve hacim zaten düşük. Ürün portföyde yer kaplamaya devam ediyor."
         ),
-        recommendation="Portfoyden cikarmayi ya da siparisi tamamen durdurmayi degerlendirin.",
+        recommendation="Portföyden çıkarmayı ya da siparişi tamamen durdurmayı değerlendirin.",
         evidence_metrics=("ilk_cikis", "son_cikis", "ortalama_cikis", "son_stok"),
         impact=lambda row: _num(row, "son_stok_degeri_tl"),
         first_seen=None,
@@ -832,19 +831,19 @@ RISK_RULES = (
 # ---------------------------------------------------------------------------
 PROMPT_PROFILE = PromptProfile(
     persona=(
-        "Deri ve tekstil sektorunde 15 yil calismis, uretim ve tedarik zinciri "
-        "planlamasindan sorumlu bir yonetim danismanisin."
+        "Deri ve tekstil sektöründe 15 yıl çalışmış, üretim ve tedarik zinciri "
+        "planlamasından sorumlu bir yönetim danışmanısın."
     ),
-    domain_label="ERP stok ve satis raporu",
+    domain_label="ERP stok ve satış raporu",
     entity_noun="urun",
     entity_noun_plural="urunler",
     departments=("satinalma", "uretim", "satis", "finans"),
     kpi_glossary={
-        "kapama_ay": "Mevcut stogun son 3 donemin ortalama cikis hizinda kac ay yetecegi.",
-        "marj_yuzde": "Birim bazinda brut kar yuzdesi: (satis - maliyet) / satis.",
-        "arz_kisitli": "Stok sifir ve cikis girise kilitli; satisi talep degil tedarik belirliyor.",
-        "net_akis": "Giris eksi cikis. Surekli pozitif olmasi stok birikimi demektir.",
-        "stok_degeri_tl": "Donem sonunda depoda bagli olan sermaye (stok x birim maliyet).",
+        "kapama_ay": "Mevcut stoğun son 3 dönemin ortalama çıkış hızında kaç ay yeteceği.",
+        "marj_yuzde": "Birim bazında brüt kâr yüzdesi: (satış - maliyet) / satış.",
+        "arz_kisitli": "Stok sıfır ve çıkış girişe kilitli; satışı talep değil tedarik belirliyor.",
+        "net_akis": "Giriş eksi çıkış. Sürekli pozitif olması stok birikimi demektir.",
+        "stok_degeri_tl": "Dönem sonunda depoda bağlı olan sermaye (stok x birim maliyet).",
     },
     dynamics=(
         "mevsimsellik",
@@ -855,18 +854,18 @@ PROMPT_PROFILE = PromptProfile(
         "tedarik_kisiti",
     ),
     action_style=(
-        "Aksiyonlar somut ve sahiplenilebilir olmali: hangi departman, hangi urun, "
-        "hangi zaman ufku. 'Stoklari optimize edin' gibi genel ifadeler kullanma."
+        "Aksiyonlar somut ve sahiplenilebilir olmalı: hangi departman, hangi ürün, "
+        "hangi zaman ufku. 'Stokları optimize edin' gibi genel ifadeler kullanma."
     ),
 )
 
 
 PACK = DatasetPack(
     key="sonart-erp",
-    title="Sonart Tekstil -- ERP Stok & Satis Raporu",
+    title="Sonart Tekstil -- ERP Stok & Satış Raporu",
     description=(
-        "Logo Netsis'ten alinan donemsel stok hareket raporu. Urun bazinda giris/cikis, "
-        "donem sonu stok, birim maliyet ve satis fiyati icerir."
+        "Logo Netsis'ten alınan dönemsel stok hareket raporu. Ürün bazında giriş/çıkış, "
+        "dönem sonu stok, birim maliyet ve satış fiyatı içerir."
     ),
     entity_key="stok_kodu",
     entity_label_key="urun_adi",

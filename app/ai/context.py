@@ -80,7 +80,11 @@ gerektigini* bilmek istiyor.
    dogrulanamaz.
 3. **Genel tavsiye yasak.** "Stoklari optimize edin" degil, hangi {profile.entity_noun},
    hangi departman, hangi zaman ufku.
-4. **Turkce yaz.** Sade, kisa cumleler. Jargon yerine is dili.
+4. **Duzgun Turkce yaz.** Turkce karakterleri eksiksiz kullan: c yerine c/ç,
+   g yerine g/ğ, i yerine i/ı, o yerine o/ö, s yerine s/ş, u yerine u/ü --
+   yani "Brüt Kâr", "çıkış", "dönem", "sipariş". Bu prompt teknik nedenlerle
+   ASCII yazilmistir; ONU TAKLIT ETME. Sade, kisa cumleler; jargon yerine
+   is dili.
 5. Emin olmadigin yerde emin olmadigini soyle; uydurma.
 
 ## Aksiyon uslubu
@@ -153,8 +157,7 @@ def build_shared_context(
     entity_rows = _prioritise_entities(result, pack)
     parts += [
         "",
-        f"## {profile.entity_noun_plural.capitalize()} bazinda ozet"
-        " — TUM DONEMLERIN TOPLAMI",
+        f"## {profile.entity_noun_plural.capitalize()} bazinda ozet — TUM DONEMLERIN TOPLAMI",
         (
             "> Dikkat: bu tablodaki degerler alti donemin tamamina aittir, tek bir "
             "doneme degil. Ornegin 'sifir_stok_donem = 3' demek *seri boyunca "

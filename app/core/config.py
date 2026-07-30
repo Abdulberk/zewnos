@@ -60,7 +60,15 @@ class Settings(BaseSettings):
     #             tarif edildi. Sebep: model kategori seviyesi bir degeri dogru
     #             alintiliyor ama kapsamini bos birakiyordu; dogrulayici da onu
     #             portfoy geneliyle karsilastirip yanlis alarm veriyordu.
-    prompt_version: str = "v3"
+    #   v3 -> v4: kullaniciya gorunen tum etiketler ve risk anlatilari duzgun
+    #             Turkce'ye cevrildi ("Brut Kar" -> "Brüt Kâr"). Bu etiketler
+    #             modele giden tablolarin basliklarinda yer aldigi icin prompt
+    #             icerigi degisti; eski onbellek girdileri gecersiz.
+    #   v4 -> v5: cikti dili kurali netlestirildi ("prompt ASCII yazilmistir,
+    #             onu taklit etme"). Sebep: prompt ASCII oldugu icin model bazi
+    #             alanlarda uslubu aynalayip "kapama suresi 8.16 ay" gibi ASCII
+    #             Turkce uretiyordu; ozellikle ilk donem ve soru-cevap ucunda.
+    prompt_version: str = "v5"
 
     @field_validator("upload_dir")
     @classmethod

@@ -55,19 +55,19 @@ def ingest(raw: bytes, pack: DatasetPack) -> IngestOutcome:
     # -- 1. kodlama --------------------------------------------------------
     decoded = decode_bytes(raw)
     if not decoded.text.strip():
-        raise EmptyDatasetError("Dosya bos.")
+        raise EmptyDatasetError("Dosya boş.")
 
     if decoded.repaired:
         issues.append(
             QualityIssue(
                 code="ENCODING_REPAIRED",
-                title="Karakter kodlamasi bozuklugu onarildi",
+                title="Karakter kodlaması bozukluğu onarıldı",
                 severity=Severity.ORTA,
                 action=IssueAction.ONARILDI,
                 affected_rows=len(decoded.repaired_samples),
                 detail=(
                     "Dosya UTF-8 iken CP1252 olarak okunup tekrar kaydedilmis "
-                    "(mojibake). Turkce karakterler geri kazanildi."
+                    "(mojibake). Türkçe karakterler geri kazanıldı."
                 ),
                 samples=decoded.repaired_samples,
             )
@@ -76,13 +76,13 @@ def ingest(raw: bytes, pack: DatasetPack) -> IngestOutcome:
         issues.append(
             QualityIssue(
                 code="ENCODING_SUSPECT",
-                title="Karakter kodlamasi supheli, guvenli onarim yapilamadi",
+                title="Karakter kodlaması şüpheli, güvenli onarım yapılamadı",
                 severity=Severity.YUKSEK,
                 action=IssueAction.ISARETLENDI,
                 affected_rows=0,
                 detail=(
-                    "Metinde mojibake izi var ancak geri donusu kayipsiz degil. "
-                    "Veriyi bozmamak icin dokunulmadi; kaynak export'un kodlamasi "
+                    "Metinde mojibake izi var ancak geri dönüşü kayıpsız değil. "
+                    "Veriyi bozmamak için dokunulmadı; kaynak export'un kodlaması "
                     "kontrol edilmeli."
                 ),
             )
@@ -92,7 +92,7 @@ def ingest(raw: bytes, pack: DatasetPack) -> IngestOutcome:
     frame = _parse_csv(decoded.text)
     raw_row_count = frame.height
     if raw_row_count == 0:
-        raise EmptyDatasetError("Dosyada baslik disinda satir yok.")
+        raise EmptyDatasetError("Dosyada başlık dışında satır yok.")
 
     # -- 3. baslik eslestirme ---------------------------------------------
     frame, issues_headers = _map_headers(frame, pack)
@@ -131,8 +131,8 @@ def ingest(raw: bytes, pack: DatasetPack) -> IngestOutcome:
 
     if clean.height == 0:
         raise EmptyDatasetError(
-            "Tum satirlar zorunlu alan eksikligi nedeniyle karantinaya alindi; "
-            "analiz edilebilecek veri kalmadi."
+            "Tüm satırlar zorunlu alan eksikliği nedeniyle karantinaya alındı; "
+            "analiz edilebilecek veri kalmadı."
         )
 
     # -- 10. butunluk kurallari (temiz veri uzerinde) ----------------------
@@ -198,7 +198,7 @@ def _map_headers(frame: pl.DataFrame, pack: DatasetPack) -> tuple[pl.DataFrame, 
         issues.append(
             QualityIssue(
                 code="UNKNOWN_COLUMNS",
-                title="Semada tanimli olmayan kolonlar yok sayildi",
+                title="Şemada tanımlı olmayan kolonlar yok sayıldı",
                 severity=Severity.BILGI,
                 action=IssueAction.ISARETLENDI,
                 affected_rows=0,
@@ -264,13 +264,13 @@ def _coerce_types(
             issues.append(
                 QualityIssue(
                     code="MISSING_DETECTED",
-                    title=f"'{column.label or name}' alaninda eksik/okunamayan deger",
+                    title=f"'{column.label or name}' alanında eksik/okunamayan değer",
                     severity=Severity.BILGI,
                     action=IssueAction.ISARETLENDI,
                     affected_rows=null_count,
                     detail=(
-                        f"{null_count} satirda deger bos ya da sayiya cevrilemedi. "
-                        "Tamamlama kurallari bir sonraki adimda denenecek."
+                        f"{null_count} satırda değer boş ya da sayıya çevrilemedi. "
+                        "Tamamlama kuralları bir sonraki adımda denenecek."
                     ),
                 )
             )
@@ -285,11 +285,11 @@ def _coerce_types(
             issues.append(
                 QualityIssue(
                     code="INVALID_PERIOD_FORMAT",
-                    title="Donem formati beklenen YYYY-AA kalibina uymuyor",
+                    title="Dönem formatı beklenen YYYY-AA kalıbına uymuyor",
                     severity=Severity.YUKSEK,
                     action=IssueAction.KARANTINA,
                     affected_rows=bad.height,
-                    detail="Bu satirlar zaman serisine dahil edilemez.",
+                    detail="Bu satırlar zaman serisine dahil edilemez.",
                     samples=tuple(
                         str(v) for v in bad.get_column(period_key).unique().to_list()[:5]
                     ),
@@ -311,14 +311,14 @@ def _drop_exact_duplicates(frame: pl.DataFrame) -> tuple[pl.DataFrame, QualityIs
         return frame, None
     return deduped, QualityIssue(
         code="DUPLICATE_EXACT",
-        title="Birebir ayni satirlar kaldirildi",
+        title="Birebir aynı satırlar kaldırıldı",
         severity=Severity.ORTA,
         action=IssueAction.SILINDI,
         affected_rows=removed,
         detail=(
-            f"{removed} satir tum kolonlariyla birebir tekrar ediyordu. "
+            f"{removed} satır tüm kolonlarıyla birebir tekrar ediyordu. "
             "ERP export'larinda sayfalama/birlestirme hatasinin tipik izi. "
-            "Toplamlari sismemesi icin tekil hale getirildi."
+            "Toplamları şişmemesi için tekil hale getirildi."
         ),
     )
 
@@ -335,18 +335,18 @@ def _resolve_key_duplicates(
     if counts.height == 0:
         return frame, None
 
-    samples = tuple(f"{row[0]} / {row[1]} ({row[2]} kayit)" for row in counts.head(5).iter_rows())
+    samples = tuple(f"{row[0]} / {row[1]} ({row[2]} kayıt)" for row in counts.head(5).iter_rows())
     deduped = frame.unique(subset=keys, keep="last", maintain_order=True)
     removed = frame.height - deduped.height
     return deduped, QualityIssue(
         code="DUPLICATE_KEY",
-        title="Ayni donem icin celisen kayitlar",
+        title="Aynı dönem için çelişen kayıtlar",
         severity=Severity.YUKSEK,
         action=IssueAction.SILINDI,
         affected_rows=removed,
         detail=(
-            "Ayni urun-donem cifti icin birden fazla ve birbirinden farkli kayit "
-            "bulundu. En son kayit dogru kabul edildi (ERP'de duzeltme kaydi "
+            "Aynı ürün-dönem çifti için birden fazla ve birbirinden farklı kayıt "
+            "bulundu. En son kayıt doğru kabul edildi (ERP'de düzeltme kaydı "
             "genellikle sonradan yazilir)."
         ),
         samples=samples,
@@ -389,22 +389,22 @@ def _impute(
                     f"{r[0]} / {r[1]}: ileri={r[2]:.0f} geri={r[3]:.0f}" for r in rows.iter_rows()
                 )
                 ambiguous_detail = (
-                    " Ileri ve geri yonde hesaplanan degerler uyusmuyor -- veri "
-                    "setinde bu kayit icin gercek bir tutarsizlik var. Ileri yondeki "
-                    "deger kullanildi ve durum raporlandi."
+                    " İleri ve geri yönde hesaplanan değerler uyuşmuyor -- veri "
+                    "setinde bu kayıt için gerçek bir tutarsızlık var. İleri yöndeki "
+                    "değer kullanıldı ve durum raporlandı."
                 )
                 issues.append(
                     QualityIssue(
                         code="IMPUTATION_AMBIGUOUS",
-                        title="Eksik deger iki yonden farkli hesaplaniyor",
+                        title="Eksik değer iki yönden farklı hesaplanıyor",
                         severity=Severity.YUKSEK,
                         action=IssueAction.ISARETLENDI,
                         affected_rows=conflict.height,
                         detail=(
-                            "Eksik satir, onceki donemden ileri dogru ve sonraki "
-                            "donemden geri dogru hesaplandiginda farkli sonuc veriyor. "
-                            "Bu, eksik satirin komsu donemlerle celistigini gosterir; "
-                            "kaynak sistemde bu kayit dogrulanmali."
+                            "Eksik satır, önceki dönemden ileri doğru ve sonraki "
+                            "dönemden geri doğru hesaplandığında farklı sonuç veriyor. "
+                            "Bu, eksik satirin komsu donemlerle çeliştiğini gosterir; "
+                            "kaynak sistemde bu kayıt doğrulanmalı."
                         ),
                         samples=samples,
                     )
@@ -452,17 +452,17 @@ def _detect_period_gaps(frame: pl.DataFrame, pack: DatasetPack) -> QualityIssue 
         return None
 
     samples = tuple(
-        f"{row[0]}: {row[1]}/{len(all_periods)} donem" for row in incomplete.head(5).iter_rows()
+        f"{row[0]}: {row[1]}/{len(all_periods)} dönem" for row in incomplete.head(5).iter_rows()
     )
     return QualityIssue(
         code="PERIOD_GAP",
-        title="Bazi kayitlarda donem bosluklari var",
+        title="Bazı kayıtlarda dönem boşlukları var",
         severity=Severity.ORTA,
         action=IssueAction.ISARETLENDI,
         affected_rows=incomplete.height,
         detail=(
-            f"Veri seti {len(all_periods)} donem iceriyor ancak bazi kayitlar tum "
-            "donemlerde bulunmuyor. Trend hesaplari bu kayitlar icin daha az "
+            f"Veri seti {len(all_periods)} dönem içeriyor ancak bazı kayıtlar tüm "
+            "dönemlerde bulunmuyor. Trend hesapları bu kayıtlar için daha az "
             "noktaya dayanir."
         ),
         samples=samples,
@@ -494,13 +494,13 @@ def _quarantine_incomplete(
         quarantined,
         QualityIssue(
             code="ROW_QUARANTINED",
-            title="Tamamlanamayan satirlar analiz disi birakildi",
+            title="Tamamlanamayan satırlar analiz dışı bırakıldı",
             severity=Severity.YUKSEK,
             action=IssueAction.KARANTINA,
             affected_rows=quarantined.height,
             detail=(
                 "Zorunlu alanlari eksik olan ve veri setinin kendi ic tutarliligindan "
-                "turetilemeyen satirlar. Yanlis sonuc uretmemek icin hesaplamalara "
+                "türetilemeyen satırlar. Yanlış sonuç üretmemek için hesaplamalara "
                 "dahil edilmedi; ham hali ayrica saklaniyor."
             ),
             samples=samples,
@@ -540,7 +540,7 @@ def _check_integrity(frame: pl.DataFrame, pack: DatasetPack) -> list[QualityIssu
             # Sessizce yutmuyoruz: eksik kolon genellikle pack'te bir hata
             # demektir ve gizlenirse kural hic calismadan "gecmis" gorunur.
             _log.warning(
-                "Butunluk kurali calistirilamadi",
+                "Bütünlük kuralı çalıştırılamadı",
                 extra={"rule": rule.code, "pack": pack.key, "error": str(exc)},
             )
             continue

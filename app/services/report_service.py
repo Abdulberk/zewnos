@@ -203,7 +203,7 @@ def build_report(
         rightMargin=18 * mm,
         topMargin=16 * mm,
         bottomMargin=16 * mm,
-        title=f"{pack.title} - Yonetici Raporu",
+        title=f"{pack.title} - Yönetici Raporu",
         author="Sonart Insight",
     )
     story: list[Any] = []
@@ -213,17 +213,17 @@ def build_report(
     story.append(Paragraph(pack.title, styles["title"]))
     story.append(
         Paragraph(
-            f"Yonetici raporu &nbsp;·&nbsp; {dataset_name} &nbsp;·&nbsp; "
+            f"Yönetici raporu &nbsp;·&nbsp; {dataset_name} &nbsp;·&nbsp; "
             f"{result.periods[0]} - {result.periods[-1]} &nbsp;·&nbsp; "
-            f"{result.entity_count} kayit &nbsp;·&nbsp; "
-            f"uretim: {datetime.now(UTC).strftime('%d.%m.%Y %H:%M')} UTC",
+            f"{result.entity_count} kayıt &nbsp;·&nbsp; "
+            f"üretim: {datetime.now(UTC).strftime('%d.%m.%Y %H:%M')} UTC",
             styles["subtitle"],
         )
     )
 
     # --- KPI seridi ---
     if result.headline_metrics:
-        story.append(Paragraph(f"Son donem ({result.periods[-1]}) gostergeleri", styles["h2"]))
+        story.append(Paragraph(f"Son dönem ({result.periods[-1]}) göstergeleri", styles["h2"]))
         labels = [Paragraph(f"<b>{m.label}</b>", styles["cell"]) for m in result.headline_metrics]
         values = [
             Paragraph(
@@ -238,10 +238,10 @@ def build_report(
     # --- yonetici ozeti (AI) ---
     summary = (analysis or {}).get("summary")
     if summary:
-        story.append(Paragraph("Yonetici ozeti", styles["h2"]))
+        story.append(Paragraph("Yönetici özeti", styles["h2"]))
         story.append(Paragraph(f"<b>{summary['headline']}</b>", styles["body"]))
         story.append(Paragraph(summary["situation"], styles["body"]))
-        story.append(Paragraph("<b>Alti donemin hikayesi</b>", styles["h3"]))
+        story.append(Paragraph("<b>Altı dönemin hikayesi</b>", styles["h3"]))
         story.append(Paragraph(summary["period_narrative"], styles["body"]))
 
         if summary.get("strategic_actions"):
@@ -271,9 +271,9 @@ def build_report(
             )
 
     # --- donemsel trend ---
-    story.append(Paragraph("Donemsel trend", styles["h2"]))
+    story.append(Paragraph("Dönemsel trend", styles["h2"]))
     headline_names = [a.name for a in pack.headline_aggregates]
-    header = [Paragraph("<b>Donem</b>", styles["cell"])] + [
+    header = [Paragraph("<b>Dönem</b>", styles["cell"])] + [
         Paragraph(f"<b>{a.label}</b>", styles["cell"]) for a in pack.headline_aggregates
     ]
     rows = [header]
@@ -294,16 +294,16 @@ def build_report(
     story.append(
         Paragraph(
             f"Motor {len(result.risks)} risk tespit etti. Parasal etkisi tahmin "
-            f"edilebilenlerin toplami: <b>{_money(total_impact)}</b>.",
+            f"edilebilenlerin toplamı: <b>{_money(total_impact)}</b>.",
             styles["body"],
         )
     )
     rows = [
         [
             Paragraph("<b>Agirlik</b>", styles["cell"]),
-            Paragraph("<b>Kayit</b>", styles["cell"]),
+            Paragraph("<b>Kayıt</b>", styles["cell"]),
             Paragraph("<b>Bulgu</b>", styles["cell"]),
-            Paragraph("<b>Ilk gorulme</b>", styles["cell"]),
+            Paragraph("<b>İlk görülme</b>", styles["cell"]),
             Paragraph("<b>Etki</b>", styles["cell"]),
         ]
     ]
@@ -339,11 +339,11 @@ def build_report(
     periods = (analysis or {}).get("periods") or []
     if periods:
         story.append(PageBreak())
-        story.append(Paragraph("Doneme ozgu analiz ve aksiyonlar", styles["h2"]))
+        story.append(Paragraph("Döneme özgü analiz ve aksiyonlar", styles["h2"]))
         for period in periods:
             block: list[Any] = [
                 Paragraph(f"{period['period']} — {period['headline']}", styles["h3"]),
-                Paragraph(f"<i>Degisim:</i> {period['delta_vs_prev']}", styles["body"]),
+                Paragraph(f"<i>Değişim:</i> {period['delta_vs_prev']}", styles["body"]),
             ]
             if period.get("dominant_dynamics"):
                 block.append(
@@ -371,7 +371,7 @@ def build_report(
         Paragraph(
             f"Saglik puani <b>{quality.health_score}/100</b>. "
             f"{quality.raw_row_count} ham satirdan {quality.clean_row_count} tanesi "
-            f"islendi, {quality.quarantined_row_count} tanesi karantinaya alindi. "
+            f"işlendi, {quality.quarantined_row_count} tanesi karantinaya alındı. "
             f"Kodlama: {quality.encoding_detected}.",
             styles["body"],
         )
@@ -380,8 +380,8 @@ def build_report(
         [
             Paragraph("<b>Agirlik</b>", styles["cell"]),
             Paragraph("<b>Bulgu</b>", styles["cell"]),
-            Paragraph("<b>Satir</b>", styles["cell"]),
-            Paragraph("<b>Yapilan islem</b>", styles["cell"]),
+            Paragraph("<b>Satır</b>", styles["cell"]),
+            Paragraph("<b>Yapılan işlem</b>", styles["cell"]),
         ]
     ]
     for issue in quality.issues:
@@ -416,10 +416,10 @@ def build_report(
         story.append(
             Paragraph(
                 f"AI'in urettigi {grounding['total_evidence']} kanittan "
-                f"{grounding['verified_evidence']} tanesi hesaplanmis tablolarda "
+                f"{grounding['verified_evidence']} tanesi hesaplanmış tablolarda "
                 f"birebir dogrulandi "
                 f"(<b>%{grounding['grounding_ratio'] * 100:.0f}</b>). "
-                "Sayilar Polars tarafindan hesaplanir; AI yalnizca yorumlar.",
+                "Sayılar Polars tarafından hesaplanır; AI yalnızca yorumlar.",
                 styles["body"],
             )
         )

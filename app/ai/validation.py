@@ -171,7 +171,7 @@ def verify(evidence_items: Iterable[Evidence], index: FactIndex) -> GroundingRep
                     period=item.period,
                     claimed=item.value,
                     expected=None,
-                    reason="Metrik hesaplanmis tablolarda bulunamadi.",
+                    reason="Metrik hesaplanmış tablolarda bulunamadı.",
                 )
             )
             continue
@@ -187,7 +187,7 @@ def verify(evidence_items: Iterable[Evidence], index: FactIndex) -> GroundingRep
                     period=item.period,
                     claimed=item.value,
                     expected=expected,
-                    reason="Deger hesaplanan sayidan sapiyor.",
+                    reason="Değer hesaplanan sayıdan sapıyor.",
                 )
             )
     return report
