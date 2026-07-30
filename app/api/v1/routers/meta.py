@@ -6,18 +6,19 @@ from fastapi import APIRouter
 
 from app.api.deps import SettingsDep
 from app.api.mappers import pack_out
+from app.api.responses import COMMON_ERRORS
 from app.schemas.common import PackOut
 from app.services.registry import list_packs
 
-router = APIRouter(tags=["meta"])
+router = APIRouter(tags=["meta"], responses=COMMON_ERRORS)
 
 
-@router.get("/health", summary="Servis ayakta mi")
+@router.get("/health", summary="Servis ayakta mı")
 async def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@router.get("/health/ready", summary="Bagimliliklar hazir mi")
+@router.get("/health/ready", summary="Bağımlılıklar hazır mı")
 async def ready(settings: SettingsDep) -> dict[str, object]:
     return {
         "status": "ok",
@@ -31,11 +32,11 @@ async def ready(settings: SettingsDep) -> dict[str, object]:
 @router.get(
     "/packs",
     response_model=list[PackOut],
-    summary="Tanimli rapor tipleri",
+    summary="Tanımlı rapor tipleri",
     description=(
-        "Her kayit bir 'dataset pack'. Yeni bir rapor tipi eklemek icin motora, "
-        "endpoint'lere veya AI katmanina dokunmak gerekmez -- yalnizca yeni bir "
-        "pack tanimlanip buraya kaydedilir."
+        "Her kayıt bir 'dataset pack'. Yeni bir rapor tipi eklemek için motora, "
+        "endpoint'lere veya AI katmanına dokunmak gerekmez -- yalnızca yeni bir "
+        "pack tanımlanıp buraya kaydedilir."
     ),
 )
 async def packs() -> list[PackOut]:

@@ -147,10 +147,16 @@ class AnalysisOrchestrator:
 
         asyncio.gather(return_exceptions=True) davranisini tek cagri icin de
         saglar; boylece asagidaki dongude tek tip islem yapilir.
+
+        CancelledError yakalanmaz ve yeniden firlatilir: istemci baglantiyi
+        kestiginde iptal yukari gitmezse kalan donem cagrilari calismaya devam
+        eder ve kimsenin okumayacagi bir yanit icin para harcanir.
         """
         try:
             return await self._analyze_period(*args, **kwargs)
-        except BaseException as exc:
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
             return exc
 
     async def _analyze_period(

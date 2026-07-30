@@ -207,3 +207,45 @@ def test_bosluklu_ve_virgullu_sayilar_okunur(sonart_pack: DatasetPack):
     )
     outcome = ingest(csv.replace(",\n", "\n").encode(), sonart_pack)
     assert outcome.report.clean_row_count >= 1
+
+
+# ---------------------------------------------------------------------------
+# sayi yazim bicimleri
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize(
+    ("yazim", "beklenen"),
+    [
+        ("12500", 12500.0),  # sade
+        ("12.5", 12.5),  # Ingilizce ondalik
+        ("12,5", 12.5),  # Turkce ondalik
+        ("12.500", 12500.0),  # Turkce binlik  <-- eskiden 12.5 okunuyordu
+        ("12,500", 12500.0),  # Ingilizce binlik
+        ("1.234,56", 1234.56),  # Turkce karisik <-- eskiden null oluyordu
+        ("1,234.56", 1234.56),  # Ingilizce karisik
+        ("1 200", 1200.0),  # binlik boslugu
+        ("-12.500", -12500.0),  # negatif
+    ],
+)
+def test_sayi_yazim_bicimleri_dogru_okunur(sonart_pack: DatasetPack, yazim: str, beklenen: float):
+    """Binlik ayraci ondalik ayraciyla karistirilmamali.
+
+    "12.500" kor bir nokta silme/birakma ile 1000 kat yanlis okunabilir; bu
+    hata sessizdir cunku sonuc yine gecerli bir sayidir.
+    """
+    csv = HEADER + f'U001,Test,Giyimlik,Ana Depo,2026-01,10,5,100,"{yazim}",20\n'
+    outcome = ingest(csv.encode(), sonart_pack)
+    assert series_value(outcome.clean, "U001", "2026-01", "birim_maliyet_tl") == beklenen
+
+
+def test_cozulemeyen_sayi_sessizce_yanlis_okunmaz(sonart_pack: DatasetPack):
+    """Taninmayan yazim null olur ve kalite raporunda gorunur.
+
+    Sessiz yanlis bir sayidansa gurultulu bir eksik yeglenir: eksik deger
+    imputasyon/karantina hattina girer, yanlis deger hicbir yerde yakalanmaz.
+    """
+    csv = HEADER + (
+        "U001,Test,Giyimlik,Ana Depo,2026-01,10,5,100,12.34.56,20\n"
+        "U001,Test,Giyimlik,Ana Depo,2026-02,10,5,105,30,20\n"
+    )
+    outcome = ingest(csv.encode(), sonart_pack)
+    assert "MISSING_DETECTED" in codes(outcome)

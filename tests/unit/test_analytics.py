@@ -275,3 +275,22 @@ def test_tek_donemli_veri_patlamaz(sonart_pack: DatasetPack):
     assert result.periods == ("2026-01",)
     assert result.deltas[0].previous_period is None
     assert entity_row(result, "U001")["trend_step"] == 0.0
+
+
+def test_departman_anahtari_ile_etiketi_ayridir(sonart_pack, ads_pack):
+    """Sozlesme degeri ASCII kalir, ekranda gorunen etiket Turkce olur.
+
+    Ikisi ayni alan olsaydi ya API'de "Üretim" doner (istemci dallanmasi
+    kirilgan olur) ya da PDF'te "uretim" yazardi.
+    """
+    for pack in (sonart_pack, ads_pack):
+        profile = pack.prompt_profile
+        for key in profile.department_keys:
+            assert key.isascii(), f"{pack.key}: sozlesme degeri ASCII olmali -> {key}"
+            assert key == key.lower()
+            assert profile.department_label(key) != "", f"{pack.key}: {key} etiketsiz"
+
+    sonart = sonart_pack.prompt_profile
+    assert sonart.department_label("uretim") == "Üretim"
+    # taninmayan anahtar sessizce kaybolmaz, oldugu gibi doner
+    assert sonart.department_label("bilinmeyen") == "bilinmeyen"

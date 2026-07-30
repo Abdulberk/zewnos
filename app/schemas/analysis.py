@@ -14,7 +14,7 @@ class AnalysisResponse(BaseModel):
     dataset_id: str
     pack_key: str
     model: str
-    cached: bool = Field(description="True ise sonuc onbellekten geldi; yeni AI cagrisi yapilmadi.")
+    cached: bool = Field(description="True ise sonuç önbellekten geldi; yeni AI çağrısı yapılmadı.")
     cached_at: str | None = None
     periods: list[PeriodAnalysis]
     summary: ExecutiveSummary | None
@@ -25,7 +25,7 @@ class AnalysisResponse(BaseModel):
 
 class AskRequest(BaseModel):
     question: str = Field(
-        min_length=3, max_length=500, examples=["Marji en hizli daralan urun hangisi?"]
+        min_length=3, max_length=500, examples=["Marjı en hızlı daralan ürün hangisi?"]
     )
 
 

@@ -6,9 +6,10 @@ sessizce degismemesi. Kirilma burada, derleme/test zamaninda goruluyor.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Any
 
-from app.domain.models import AnalyticsResult, QualityReport, RiskFinding
+from app.domain.models import QualityReport, RiskFinding
 from app.domain.packs.base import DatasetPack
 from app.schemas.common import MetricOut, PackOut, QualityReportOut, RiskOut
 from app.schemas.dataset import DatasetSummary
@@ -57,16 +58,22 @@ def pack_out(pack: DatasetPack) -> PackOut:
     )
 
 
-def severity_counts(result: AnalyticsResult) -> dict[str, int]:
+def severity_counts(risks: Sequence[RiskFinding]) -> dict[str, int]:
+    """Agirlik dagilimi.
+
+    Risk dizisi alir, AnalyticsResult degil: filtrelenmis bir liste geldiginde
+    dagilim da o listeyi anlatsin. Aksi halde ?severity=kritik sorgusunda
+    total=3 ama dagilim 18 gosterir -- ekranda birbirini tutmayan iki sayi.
+    """
     counts: dict[str, int] = {}
-    for risk in result.risks:
+    for risk in risks:
         counts[risk.severity.value] = counts.get(risk.severity.value, 0) + 1
     return counts
 
 
-def code_counts(result: AnalyticsResult) -> dict[str, int]:
+def code_counts(risks: Sequence[RiskFinding]) -> dict[str, int]:
     counts: dict[str, int] = {}
-    for risk in result.risks:
+    for risk in risks:
         counts[risk.code] = counts.get(risk.code, 0) + 1
     return counts
 
@@ -77,8 +84,13 @@ def entity_columns(pack: DatasetPack) -> list[dict[str, str]]:
         {"name": pack.entity_key, "label": "Kod", "unit": ""},
         {"name": pack.entity_label_key, "label": "Ad", "unit": ""},
     ]
+    # Boyut etiketi pack'teki ColumnDef'ten gelir. snake_case'i .title() ile
+    # insanlastirmak ikinci bir etiket kaynagi yaratirdi ("urun_kategorisi" ->
+    # "Urun Kategorisi"); tek dogruluk kaynagi pack olmali.
+    labels = {column.canonical: column.label for column in pack.columns}
     columns += [
-        {"name": dim, "label": dim.replace("_", " ").title(), "unit": ""} for dim in pack.dimensions
+        {"name": dim, "label": labels.get(dim) or dim.replace("_", " ").title(), "unit": ""}
+        for dim in pack.dimensions
     ]
     columns += [
         {"name": agg.name, "label": agg.label, "unit": agg.unit.value}

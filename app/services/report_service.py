@@ -241,18 +241,20 @@ def build_report(
         story.append(Paragraph("Yönetici özeti", styles["h2"]))
         story.append(Paragraph(f"<b>{summary['headline']}</b>", styles["body"]))
         story.append(Paragraph(summary["situation"], styles["body"]))
-        story.append(Paragraph("<b>Altı dönemin hikayesi</b>", styles["h3"]))
+        story.append(Paragraph("<b>Altı dönemin hikâyesi</b>", styles["h3"]))
         story.append(Paragraph(summary["period_narrative"], styles["body"]))
 
         if summary.get("strategic_actions"):
             story.append(Paragraph("Stratejik aksiyonlar", styles["h3"]))
-            rows = [["Oncelik", "Aksiyon", "Sahip", "Ufuk", "Etki"]]
+            rows = [["Öncelik", "Aksiyon", "Sahip", "Ufuk", "Etki"]]
             for action in summary["strategic_actions"]:
                 rows.append(
                     [
                         Paragraph(action["priority"].upper(), styles["cell"]),
                         Paragraph(action["title"], styles["cell"]),
-                        Paragraph(action["owner"], styles["cell"]),
+                        Paragraph(
+                            pack.prompt_profile.department_label(action["owner"]), styles["cell"]
+                        ),
                         Paragraph(action["horizon"].replace("_", " "), styles["cell"]),
                         Paragraph(_money(action.get("expected_impact_tl")), styles["cell"]),
                     ]
@@ -300,7 +302,7 @@ def build_report(
     )
     rows = [
         [
-            Paragraph("<b>Agirlik</b>", styles["cell"]),
+            Paragraph("<b>Ağırlık</b>", styles["cell"]),
             Paragraph("<b>Kayıt</b>", styles["cell"]),
             Paragraph("<b>Bulgu</b>", styles["cell"]),
             Paragraph("<b>İlk görülme</b>", styles["cell"]),
@@ -356,7 +358,8 @@ def build_report(
                 block.append(
                     Paragraph(
                         f"• <b>[{action['priority']}]</b> {action['title']} "
-                        f"<font size=7.5 color='#6B7280'>({action['owner']} / "
+                        f"<font size=7.5 color='#6B7280'>"
+                        f"({pack.prompt_profile.department_label(action['owner'])} / "
                         f"{action['horizon'].replace('_', ' ')})</font>",
                         styles["body"],
                     )
@@ -369,8 +372,8 @@ def build_report(
     story.append(Paragraph("Veri kalitesi", styles["h2"]))
     story.append(
         Paragraph(
-            f"Saglik puani <b>{quality.health_score}/100</b>. "
-            f"{quality.raw_row_count} ham satirdan {quality.clean_row_count} tanesi "
+            f"Sağlık puanı <b>{quality.health_score}/100</b>. "
+            f"{quality.raw_row_count} ham satırdan {quality.clean_row_count} tanesi "
             f"işlendi, {quality.quarantined_row_count} tanesi karantinaya alındı. "
             f"Kodlama: {quality.encoding_detected}.",
             styles["body"],
@@ -378,7 +381,7 @@ def build_report(
     )
     rows = [
         [
-            Paragraph("<b>Agirlik</b>", styles["cell"]),
+            Paragraph("<b>Ağırlık</b>", styles["cell"]),
             Paragraph("<b>Bulgu</b>", styles["cell"]),
             Paragraph("<b>Satır</b>", styles["cell"]),
             Paragraph("<b>Yapılan işlem</b>", styles["cell"]),
@@ -412,12 +415,12 @@ def build_report(
 
     grounding = (analysis or {}).get("grounding")
     if grounding:
-        story.append(Paragraph("AI ciktisinin veriye dayaniligi", styles["h2"]))
+        story.append(Paragraph("AI çıktısının veriye dayanılığı", styles["h2"]))
         story.append(
             Paragraph(
-                f"AI'in urettigi {grounding['total_evidence']} kanittan "
+                f"AI'ın ürettiği {grounding['total_evidence']} kanıttan "
                 f"{grounding['verified_evidence']} tanesi hesaplanmış tablolarda "
-                f"birebir dogrulandi "
+                f"birebir doğrulandı "
                 f"(<b>%{grounding['grounding_ratio'] * 100:.0f}</b>). "
                 "Sayılar Polars tarafından hesaplanır; AI yalnızca yorumlar.",
                 styles["body"],

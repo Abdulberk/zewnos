@@ -237,6 +237,25 @@ async def test_risk_filtreleri_calisir(client: AsyncClient):
     assert all(r["first_seen_period"] == "2026-03" for r in mart["risks"])
 
 
+@pytest.mark.asyncio
+async def test_risk_filtresinde_dagilim_da_filtrelenir(client: AsyncClient):
+    """Filtrelenmis yanitta total ile dagilim ayni kumeyi anlatmali.
+
+    Aksi halde ekranda "3 kritik risk" basligi altinda 18'lik bir dagilim
+    grafigi cikar; kullanici hangisine inanacagini bilemez.
+    """
+    dataset_id = (await upload(client, "sonart_erp_cok_donemli.csv"))["dataset"]["id"]
+    tumu = (await client.get(f"{PREFIX}/datasets/{dataset_id}/risks")).json()
+    kritik = (
+        await client.get(f"{PREFIX}/datasets/{dataset_id}/risks", params={"severity": "kritik"})
+    ).json()
+
+    assert kritik["total"] < tumu["total"], "filtre gercekten daraltmali"
+    assert sum(kritik["by_severity"].values()) == kritik["total"]
+    assert sum(kritik["by_code"].values()) == kritik["total"]
+    assert set(kritik["by_severity"]) == {"kritik"}
+
+
 # ---------------------------------------------------------------------------
 # AI akisi (sahte istemci)
 # ---------------------------------------------------------------------------

@@ -37,7 +37,7 @@ class OverviewResponse(BaseModel):
     entity_count: int
     headline_metrics: list[MetricOut]
     period_rows: list[dict[str, Any]] = Field(
-        description="Donem bazinda portfoy ozeti -- trend grafiklerinin kaynagi."
+        description="Dönem bazında portföy özeti -- trend grafiklerinin kaynağı."
     )
     risk_counts_by_severity: dict[str, int]
     top_risks: list[RiskOut]
@@ -47,7 +47,7 @@ class PeriodsResponse(BaseModel):
     periods: list[str]
     rows: list[dict[str, Any]]
     deltas: list[dict[str, Any]] = Field(
-        description="Her donemin bir oncekine gore degisimi ve o donemde acilan riskler."
+        description="Her dönemin bir öncekine göre değişimi ve o dönemde açılan riskler."
     )
     dimension_rows: list[dict[str, Any]]
 
@@ -57,11 +57,11 @@ class EntitiesResponse(BaseModel):
     entity_label_key: str
     dimensions: list[str]
     columns: list[dict[str, str]] = Field(
-        description="Kolon adi/etiket/birim -- tablo basliklarini frontend'e tasir."
+        description="Kolon adı/etiket/birim -- tablo başlıklarını frontend'e taşır."
     )
     rows: list[dict[str, Any]]
     series_rows: list[dict[str, Any]] = Field(
-        description="(kayit, donem) bazinda uzun tablo -- kayit detay grafikleri icin."
+        description="(kayıt, dönem) bazında uzun tablo -- kayıt detay grafikleri için."
     )
 
 

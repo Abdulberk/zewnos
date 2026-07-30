@@ -11,7 +11,7 @@
         "tags": [
           "meta"
         ],
-        "summary": "Servis ayakta mi",
+        "summary": "Servis ayakta mı",
         "operationId": "health_api_v1_health_get",
         "responses": {
           "200": {
@@ -27,6 +27,46 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -36,7 +76,7 @@
         "tags": [
           "meta"
         ],
-        "summary": "Bagimliliklar hazir mi",
+        "summary": "Bağımlılıklar hazır mı",
         "operationId": "ready_api_v1_health_ready_get",
         "responses": {
           "200": {
@@ -49,6 +89,46 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -58,8 +138,8 @@
         "tags": [
           "meta"
         ],
-        "summary": "Tanimli rapor tipleri",
-        "description": "Her kayit bir 'dataset pack'. Yeni bir rapor tipi eklemek icin motora, endpoint'lere veya AI katmanina dokunmak gerekmez -- yalnizca yeni bir pack tanimlanip buraya kaydedilir.",
+        "summary": "Tanımlı rapor tipleri",
+        "description": "Her kayıt bir 'dataset pack'. Yeni bir rapor tipi eklemek için motora, endpoint'lere veya AI katmanına dokunmak gerekmez -- yalnızca yeni bir pack tanımlanıp buraya kaydedilir.",
         "operationId": "packs_api_v1_packs_get",
         "responses": {
           "200": {
@@ -75,6 +155,46 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -84,7 +204,7 @@
         "tags": [
           "datasets"
         ],
-        "summary": "Yuklenmis veri setleri",
+        "summary": "Yüklenmiş veri setleri",
         "operationId": "list_datasets_api_v1_datasets_get",
         "responses": {
           "200": {
@@ -100,6 +220,56 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Dosya boyutu izin verilen sınırı aşıyor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -107,7 +277,7 @@
         "tags": [
           "datasets"
         ],
-        "summary": "CSV yukle ve isle",
+        "summary": "CSV yükle ve işle",
         "operationId": "upload_dataset_api_v1_datasets_post",
         "requestBody": {
           "content": {
@@ -130,12 +300,52 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Dosya boyutu izin verilen sınırı aşıyor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -148,7 +358,7 @@
         "tags": [
           "datasets"
         ],
-        "summary": "Veri seti ozeti",
+        "summary": "Veri seti özeti",
         "operationId": "get_dataset_api_v1_datasets__dataset_id__get",
         "parameters": [
           {
@@ -172,12 +382,52 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Dosya boyutu izin verilen sınırı aşıyor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -205,12 +455,52 @@
           "204": {
             "description": "Successful Response"
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Dosya boyutu izin verilen sınırı aşıyor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -224,7 +514,7 @@
           "datasets"
         ],
         "summary": "Veri kalitesi raporu",
-        "description": "Tespit edilen her sorun; agirligi, kac satiri etkiledigi ve **ne yapildigi** (onarildi / turetildi / silindi / karantina / isaretlendi) ile birlikte.",
+        "description": "Tespit edilen her sorun; ağırlığı, kaç satırı etkilediği ve **ne yapıldığı** (onarildi / turetildi / silindi / karantina / isaretlendi) ile birlikte.",
         "operationId": "get_quality_api_v1_datasets__dataset_id__quality_get",
         "parameters": [
           {
@@ -248,12 +538,52 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Dosya boyutu izin verilen sınırı aşıyor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -266,7 +596,7 @@
         "tags": [
           "datasets"
         ],
-        "summary": "Dashboard ozeti",
+        "summary": "Dashboard özeti",
         "operationId": "get_overview_api_v1_datasets__dataset_id__overview_get",
         "parameters": [
           {
@@ -286,11 +616,11 @@
               "type": "integer",
               "maximum": 50,
               "minimum": 1,
-              "description": "Donulecek risk sayisi",
+              "description": "Dönülecek risk sayısı",
               "default": 8,
               "title": "Top"
             },
-            "description": "Donulecek risk sayisi"
+            "description": "Dönülecek risk sayısı"
           }
         ],
         "responses": {
@@ -304,12 +634,52 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Dosya boyutu izin verilen sınırı aşıyor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -322,7 +692,7 @@
         "tags": [
           "datasets"
         ],
-        "summary": "Donemsel trend ve degisim verisi",
+        "summary": "Dönemsel trend ve değişim verisi",
         "operationId": "get_periods_api_v1_datasets__dataset_id__periods_get",
         "parameters": [
           {
@@ -346,12 +716,52 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Dosya boyutu izin verilen sınırı aşıyor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -364,7 +774,7 @@
         "tags": [
           "datasets"
         ],
-        "summary": "Kayit bazinda ozet ve zaman serisi",
+        "summary": "Kayıt bazında özet ve zaman serisi",
         "operationId": "get_entities_api_v1_datasets__dataset_id__entities_get",
         "parameters": [
           {
@@ -382,11 +792,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "(kayit, donem) uzun tablosunu da dondur",
+              "description": "(kayıt, dönem) uzun tablosunu da döndür",
               "default": true,
               "title": "Include Series"
             },
-            "description": "(kayit, donem) uzun tablosunu da dondur"
+            "description": "(kayıt, dönem) uzun tablosunu da döndür"
           }
         ],
         "responses": {
@@ -400,12 +810,52 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Dosya boyutu izin verilen sınırı aşıyor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -443,10 +893,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Agirliga gore filtre, or. 'kritik'",
+              "description": "Ağırlığa göre filtre, ör. 'kritik'",
               "title": "Severity"
             },
-            "description": "Agirliga gore filtre, or. 'kritik'"
+            "description": "Ağırlığa göre filtre, ör. 'kritik'"
           },
           {
             "name": "period",
@@ -461,10 +911,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Yalnizca bu donemde acilan riskler",
+              "description": "Yalnızca bu dönemde açılan riskler",
               "title": "Period"
             },
-            "description": "Yalnizca bu donemde acilan riskler"
+            "description": "Yalnızca bu dönemde açılan riskler"
           }
         ],
         "responses": {
@@ -478,12 +928,52 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Dosya boyutu izin verilen sınırı aşıyor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -496,8 +986,8 @@
         "tags": [
           "analysis"
         ],
-        "summary": "Analiz hazir mi, kac cagri gerekecek",
-        "description": "Frontend'in 'analiz uret' butonunu maliyet uyarisiyla gostermesi icin. Onbellekte varsa cagri yapilmayacagini bildirir.",
+        "summary": "Analiz hazır mı, kaç çağrı gerekecek",
+        "description": "Frontend'in 'analiz üret' butonunu maliyet uyarısıyla göstermesi için. Önbellekte varsa çağrı yapılmayacağını bildirir.",
         "operationId": "analysis_status_api_v1_datasets__dataset_id__analysis_status_get",
         "parameters": [
           {
@@ -521,12 +1011,72 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "AI servisi istek limitini aştı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "AI servisinden geçerli yanıt alınamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "AI yapılandırılmamış (ANTHROPIC_API_KEY yok)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -539,8 +1089,8 @@
         "tags": [
           "analysis"
         ],
-        "summary": "Donemsel analiz + yonetici ozeti uret",
-        "description": "Her donem icin paralel bir AI cagrisi, ardindan tek bir sentez cagrisi. Sonuc onbellege yazilir; ayni veri seti icin tekrar cagrildiginda AI'a gidilmez. `refresh=true` ile yeniden uretilebilir.",
+        "summary": "Dönemsel analiz + yönetici özeti üret",
+        "description": "Her dönem için paralel bir AI çağrısı, ardından tek bir sentez çağrısı. Sonuç önbelleğe yazılır; aynı veri seti için tekrar çağrıldığında AI'a gidilmez. `refresh=true` ile yeniden üretilebilir.",
         "operationId": "create_analysis_api_v1_datasets__dataset_id__analysis_post",
         "parameters": [
           {
@@ -558,11 +1108,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "Onbellegi yok say ve yeniden uret",
+              "description": "Önbelleği yok say ve yeniden üret",
               "default": false,
               "title": "Refresh"
             },
-            "description": "Onbellegi yok say ve yeniden uret"
+            "description": "Önbelleği yok say ve yeniden üret"
           }
         ],
         "responses": {
@@ -576,12 +1126,72 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "AI servisi istek limitini aştı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "AI servisinden geçerli yanıt alınamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "AI yapılandırılmamış (ANTHROPIC_API_KEY yok)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -594,8 +1204,8 @@
         "tags": [
           "analysis"
         ],
-        "summary": "Veri uzerinde serbest soru-cevap",
-        "description": "Model SQL yazmaz: hesaplanmis tablolari yorumlar. Boylece 'AI sayi hesaplamaz' kurali soru-cevapta da korunur ve her yanit kanit tasir.",
+        "summary": "Veri üzerinde serbest soru-cevap",
+        "description": "Model SQL yazmaz: hesaplanmış tabloları yorumlar. Böylece 'AI sayı hesaplamaz' kuralı soru-cevapta da korunur ve her yanıt kanıt taşır.",
         "operationId": "ask_api_v1_datasets__dataset_id__ask_post",
         "parameters": [
           {
@@ -629,12 +1239,72 @@
               }
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "AI servisi istek limitini aştı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "AI servisinden geçerli yanıt alınamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "AI yapılandırılmamış (ANTHROPIC_API_KEY yok)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -647,8 +1317,8 @@
         "tags": [
           "reports"
         ],
-        "summary": "Paylasilabilir yonetici raporu (PDF)",
-        "description": "KPI'lar, donemsel trend, risk sicili ve veri kalitesi notlari. AI analizi onbellekte varsa yonetici ozeti ve doneme ozgu aksiyonlar da eklenir; yoksa rapor yalnizca hesaplanmis verilerle uretilir ve AI cagrisi yapilmaz.",
+        "summary": "Paylaşılabilir yönetici raporu (PDF)",
+        "description": "KPI'lar, dönemsel trend, risk sicili ve veri kalitesi notları. AI analizi önbellekte varsa yönetici özeti ve döneme özgü aksiyonlar da eklenir; yoksa rapor yalnızca hesaplanmış verilerle üretilir ve AI çağrısı yapılmaz.",
         "operationId": "download_report_api_v1_datasets__dataset_id__report_pdf_get",
         "parameters": [
           {
@@ -666,11 +1336,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "Onbellekteki AI analizini rapora dahil et (yeni cagri yapmaz)",
+              "description": "Önbellekteki AI analizini rapora dahil et (yeni çağrı yapmaz)",
               "default": true,
               "title": "Include Ai"
             },
-            "description": "Onbellekteki AI analizini rapora dahil et (yeni cagri yapmaz)"
+            "description": "Önbellekteki AI analizini rapora dahil et (yeni çağrı yapmaz)"
           }
         ],
         "responses": {
@@ -680,12 +1350,42 @@
               "application/pdf": {}
             }
           },
-          "422": {
-            "description": "Validation Error",
+          "400": {
+            "description": "İstek geçersiz (bilinmeyen rapor tipi, hatalı parametre)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayıt bulunamadı",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dosya işlenemedi ya da doğrulama hatası",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Beklenmeyen hata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -783,7 +1483,7 @@
           "cached": {
             "type": "boolean",
             "title": "Cached",
-            "description": "True ise sonuc onbellekten geldi; yeni AI cagrisi yapilmadi."
+            "description": "True ise sonuç önbellekten geldi; yeni AI çağrısı yapılmadı."
           },
           "cached_at": {
             "anyOf": [
@@ -893,7 +1593,7 @@
             "minLength": 3,
             "title": "Question",
             "examples": [
-              "Marji en hizli daralan urun hangisi?"
+              "Marjı en hızlı daralan ürün hangisi?"
             ]
           }
         },
@@ -944,7 +1644,7 @@
             "type": "string",
             "format": "binary",
             "title": "File",
-            "description": "Islenecek CSV dosyasi"
+            "description": "İşlenecek CSV dosyası"
           },
           "pack": {
             "anyOf": [
@@ -956,7 +1656,7 @@
               }
             ],
             "title": "Pack",
-            "description": "Rapor tipi (or. 'sonart-erp'). Bos birakilirsa basliklardan tespit edilir."
+            "description": "Rapor tipi (ör. 'sonart-erp'). Boş bırakılırsa başlıklardan tespit edilir."
           }
         },
         "type": "object",
@@ -1050,7 +1750,7 @@
             },
             "type": "array",
             "title": "Columns",
-            "description": "Kolon adi/etiket/birim -- tablo basliklarini frontend'e tasir."
+            "description": "Kolon adı/etiket/birim -- tablo başlıklarını frontend'e taşır."
           },
           "rows": {
             "items": {
@@ -1065,7 +1765,7 @@
             },
             "type": "array",
             "title": "Series Rows",
-            "description": "(kayit, donem) bazinda uzun tablo -- kayit detay grafikleri icin."
+            "description": "(kayıt, dönem) bazında uzun tablo -- kayıt detay grafikleri için."
           }
         },
         "type": "object",
@@ -1078,6 +1778,32 @@
           "series_rows"
         ],
         "title": "EntitiesResponse"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "schema_mismatch"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "details": {
+            "type": "object",
+            "title": "Details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorResponse",
+        "description": "Tum hatalarin ortak govdesi.\n\nIstemci `code` alanina gore dallanir; mesaj metni degisse bile kirilmaz."
       },
       "Evidence": {
         "properties": {
@@ -1106,7 +1832,7 @@
               }
             ],
             "title": "Entity",
-            "description": "Ilgili kayit kodu, or. 'U005'. Portfoy geneli ise bos."
+            "description": "Degerin ait oldugu kapsam. Tek bir kayit ise kodu ('U005', 'K011'); bir kategori/depo/platform kirilimi ise o boyutun adi ('Cantalik', 'Yan Depo'); yalnizca portfoyun tamamiysa bos birak. Kirilim degerini bos birakma -- o zaman portfoy geneliyle karisir."
           },
           "period": {
             "anyOf": [
@@ -1214,19 +1940,6 @@
         "title": "GroundingOut",
         "description": "AI ciktisinin ne kadarinin hesaplanmis veriye dayandigi."
       },
-      "HTTPValidationError": {
-        "properties": {
-          "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
-            "type": "array",
-            "title": "Detail"
-          }
-        },
-        "type": "object",
-        "title": "HTTPValidationError"
-      },
       "MetricOut": {
         "properties": {
           "metric": {
@@ -1306,7 +2019,7 @@
             },
             "type": "array",
             "title": "Period Rows",
-            "description": "Donem bazinda portfoy ozeti -- trend grafiklerinin kaynagi."
+            "description": "Dönem bazında portföy özeti -- trend grafiklerinin kaynağı."
           },
           "risk_counts_by_severity": {
             "additionalProperties": {
@@ -1473,7 +2186,7 @@
             },
             "type": "array",
             "title": "Deltas",
-            "description": "Her donemin bir oncekine gore degisimi ve o donemde acilan riskler."
+            "description": "Her dönemin bir öncekine göre değişimi ve o dönemde açılan riskler."
           },
           "dimension_rows": {
             "items": {
@@ -1856,39 +2569,6 @@
           "risk_count"
         ],
         "title": "UploadResponse"
-      },
-      "ValidationError": {
-        "properties": {
-          "loc": {
-            "items": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "integer"
-                }
-              ]
-            },
-            "type": "array",
-            "title": "Location"
-          },
-          "msg": {
-            "type": "string",
-            "title": "Message"
-          },
-          "type": {
-            "type": "string",
-            "title": "Error Type"
-          }
-        },
-        "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
-        "title": "ValidationError"
       }
     }
   }

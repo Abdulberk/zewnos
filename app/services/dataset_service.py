@@ -52,11 +52,11 @@ class DatasetService:
     async def create(self, raw: bytes, filename: str, pack_key: str | None) -> LoadedDataset:
         if len(raw) > self._settings.max_upload_bytes:
             raise FileTooLargeError(
-                f"Dosya {len(raw) / 1_048_576:.1f} MB; sinir "
+                f"Dosya {len(raw) / 1_048_576:.1f} MB; sınır "
                 f"{self._settings.max_upload_bytes / 1_048_576:.0f} MB.",
             )
         if not raw.strip():
-            raise EmptyDatasetError("Yuklenen dosya bos.")
+            raise EmptyDatasetError("Yüklenen dosya boş.")
 
         pack = get_pack(pack_key) if pack_key else self._detect(raw)
         outcome = ingest(raw, pack)
@@ -103,8 +103,8 @@ class DatasetService:
         pack = detect_pack([h.strip() for h in headers])
         if pack is None:
             raise EmptyDatasetError(
-                "Dosyanin hangi rapor tipine ait oldugu anlasilamadi. "
-                "Yuklerken 'pack' parametresini acikca belirtin.",
+                "Dosyanın hangi rapor tipine ait olduğu anlaşılamadı. "
+                "Yüklerken 'pack' parametresini açıkça belirtin.",
             )
         return pack
 
@@ -115,7 +115,7 @@ class DatasetService:
     async def get_record(self, dataset_id: str) -> Dataset:
         record = await self._repository.get(dataset_id)
         if record is None:
-            raise NotFoundError(f"'{dataset_id}' kimlikli veri seti bulunamadi.")
+            raise NotFoundError(f"'{dataset_id}' kimlikli veri seti bulunamadı.")
         return record
 
     async def load(self, dataset_id: str) -> LoadedDataset:
@@ -131,7 +131,7 @@ class DatasetService:
         path = Path(record.stored_path)
         if not path.exists():
             raise NotFoundError(
-                "Veri setinin ham dosyasi diskte bulunamadi; yeniden yukleyin.",
+                "Veri setinin ham dosyası diskte bulunamadı; yeniden yükleyin.",
                 details={"dataset_id": dataset_id},
             )
 

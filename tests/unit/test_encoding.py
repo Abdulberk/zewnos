@@ -57,7 +57,10 @@ def test_mojibake_dosya_onarilir_ve_raporlanir():
     result = decode_bytes(raw)
     assert result.text == TURKCE
     assert result.repaired is True
-    assert "mojibake onarildi" in result.encoding
+    # Kullaniciya gorunen etiket onarimi soylemeli. Metnin tamamina degil
+    # anahtar kelimeye bakiyoruz: yazim degisebilir, anlam degismemeli.
+    assert "mojibake" in result.encoding
+    assert result.encoding.startswith("utf-8")
 
 
 def test_windows_1254_dosya_dogru_kodlamayla_okunur():

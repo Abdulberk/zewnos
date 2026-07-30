@@ -77,6 +77,10 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        # Tarayici, CORS altinda yalnizca acikca acilan yanit basliklarini
+        # okuyabilir. Bunlar olmadan frontend ne hata bildiriminde istek
+        # kimligini gosterebilir ne de PDF'i dogru dosya adiyla indirebilir.
+        expose_headers=["x-request-id", "x-response-time-ms", "content-disposition"],
     )
 
     @app.middleware("http")

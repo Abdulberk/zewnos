@@ -66,7 +66,7 @@ def ingest(raw: bytes, pack: DatasetPack) -> IngestOutcome:
                 action=IssueAction.ONARILDI,
                 affected_rows=len(decoded.repaired_samples),
                 detail=(
-                    "Dosya UTF-8 iken CP1252 olarak okunup tekrar kaydedilmis "
+                    "Dosya UTF-8 iken CP1252 olarak okunup tekrar kaydedilmiş "
                     "(mojibake). Türkçe karakterler geri kazanıldı."
                 ),
                 samples=decoded.repaired_samples,
@@ -169,7 +169,7 @@ def _parse_csv(text: str) -> pl.DataFrame:
             truncate_ragged_lines=True,
         )
     except Exception as exc:
-        raise IngestionError(f"CSV ayristirilamadi: {exc}") from exc
+        raise IngestionError(f"CSV ayrıştırılamadı: {exc}") from exc
 
     # tamamen bos satirlari at
     if frame.height:
@@ -210,6 +210,53 @@ def _map_headers(frame: pl.DataFrame, pack: DatasetPack) -> tuple[pl.DataFrame, 
     return frame.rename(mapping).select(list(mapping.values())), issues
 
 
+# Sayi yazim bicimleri. ERP export'lari ayni dosyada bile karisik gelebiliyor;
+# bicimi tahmin etmek yerine kaliba bakip karar veriyoruz.
+_TR_TAM = r"^-?\d{1,3}(\.\d{3})+$"  # 12.500        -> 12500
+_TR_ONDALIK = r"^-?\d+,\d+$"  # 12,5          -> 12.5
+_TR_KARISIK = r"^-?\d{1,3}(\.\d{3})+,\d+$"  # 1.234,56      -> 1234.56
+_EN_TAM = r"^-?\d{1,3}(,\d{3})+$"  # 12,500        -> 12500
+_EN_KARISIK = r"^-?\d{1,3}(,\d{3})+\.\d+$"  # 1,234.56      -> 1234.56
+_SADE = r"^-?\d+(\.\d+)?$"  # 12500 / 12.5  -> oldugu gibi
+
+
+def _normalize_number(text: pl.Expr) -> pl.Expr:
+    """Sayi metnini Polars'in okuyabilecegi tek bicime indirger.
+
+    Neden kalip esleme: "12.500" tek basina belirsizdir -- Turkce yazimda
+    on iki bin bes yuz, Ingilizce yazimda on iki nokta bes. Nokta/virgul
+    kor bir sekilde silinirse ("replace_all") ikisinden biri sessizce 1000
+    kat yanlis okunur. Kalip eslesmezse deger null olur ve kalite raporunda
+    "cevrilemeyen deger" olarak GORUNUR -- sessiz yanlis yerine gurultulu
+    eksik tercih edilir.
+
+    Belirsizlik cozumu: bir ayracin ardindan TAM UC hane geliyorsa o ayrac
+    binliktir. "12.500" -> 12500 ve "12,500" -> 12500; ondalik istegi
+    "12,5" ya da "12.5" diye yazilir. Kural iki ayrac icin de ayni.
+
+    Sira ONEMLI: kaliplar ozgulden genele denenir. "12.500" hem _TR_TAM'e
+    hem _SADE'ye uyar; _SADE once denenirse deger 1000 kat yanlis okunur.
+    """
+    compact = text.str.replace_all(r"[\s ]", "")
+    dotless = compact.str.replace_all(r"\.", "")
+    commaless = compact.str.replace_all(",", "")
+    return (
+        pl.when(compact.str.contains(_TR_KARISIK))
+        .then(dotless.str.replace(",", "."))
+        .when(compact.str.contains(_EN_KARISIK))
+        .then(commaless)
+        .when(compact.str.contains(_TR_TAM))
+        .then(dotless)
+        .when(compact.str.contains(_EN_TAM))
+        .then(commaless)
+        .when(compact.str.contains(_TR_ONDALIK))
+        .then(compact.str.replace(",", "."))
+        .when(compact.str.contains(_SADE))
+        .then(compact)
+        .otherwise(None)
+    )
+
+
 def _coerce_types(
     frame: pl.DataFrame, pack: DatasetPack
 ) -> tuple[pl.DataFrame, list[QualityIssue]]:
@@ -228,17 +275,12 @@ def _coerce_types(
         match column.dtype:
             case ColumnType.TAMSAYI:
                 expr = (
-                    cleaned.str.replace_all(r"[ .]", "")
-                    .str.replace(",", ".")
+                    _normalize_number(cleaned)
                     .cast(pl.Float64, strict=False)
                     .cast(pl.Int64, strict=False)
                 )
             case ColumnType.ONDALIK:
-                expr = (
-                    cleaned.str.replace_all(" ", "")
-                    .str.replace(",", ".")
-                    .cast(pl.Float64, strict=False)
-                )
+                expr = _normalize_number(cleaned).cast(pl.Float64, strict=False)
             case ColumnType.DONEM | ColumnType.METIN:
                 expr = cleaned
             case _:
@@ -317,7 +359,7 @@ def _drop_exact_duplicates(frame: pl.DataFrame) -> tuple[pl.DataFrame, QualityIs
         affected_rows=removed,
         detail=(
             f"{removed} satır tüm kolonlarıyla birebir tekrar ediyordu. "
-            "ERP export'larinda sayfalama/birlestirme hatasinin tipik izi. "
+            "ERP export'larında sayfalama/birleştirme hatasının tipik izi. "
             "Toplamları şişmemesi için tekil hale getirildi."
         ),
     )
@@ -347,7 +389,7 @@ def _resolve_key_duplicates(
         detail=(
             "Aynı ürün-dönem çifti için birden fazla ve birbirinden farklı kayıt "
             "bulundu. En son kayıt doğru kabul edildi (ERP'de düzeltme kaydı "
-            "genellikle sonradan yazilir)."
+            "genellikle sonradan yazılır)."
         ),
         samples=samples,
     )
@@ -403,7 +445,7 @@ def _impute(
                         detail=(
                             "Eksik satır, önceki dönemden ileri doğru ve sonraki "
                             "dönemden geri doğru hesaplandığında farklı sonuç veriyor. "
-                            "Bu, eksik satirin komsu donemlerle çeliştiğini gosterir; "
+                            "Bu, eksik satırın komşu dönemlerle çeliştiğini gösterir; "
                             "kaynak sistemde bu kayıt doğrulanmalı."
                         ),
                         samples=samples,
@@ -463,7 +505,7 @@ def _detect_period_gaps(frame: pl.DataFrame, pack: DatasetPack) -> QualityIssue 
         detail=(
             f"Veri seti {len(all_periods)} dönem içeriyor ancak bazı kayıtlar tüm "
             "dönemlerde bulunmuyor. Trend hesapları bu kayıtlar için daha az "
-            "noktaya dayanir."
+            "noktaya dayanır."
         ),
         samples=samples,
     )
@@ -499,9 +541,9 @@ def _quarantine_incomplete(
             action=IssueAction.KARANTINA,
             affected_rows=quarantined.height,
             detail=(
-                "Zorunlu alanlari eksik olan ve veri setinin kendi ic tutarliligindan "
+                "Zorunlu alanları eksik olan ve veri setinin kendi iç tutarlılığından "
                 "türetilemeyen satırlar. Yanlış sonuç üretmemek için hesaplamalara "
-                "dahil edilmedi; ham hali ayrica saklaniyor."
+                "dahil edilmedi; ham hali ayrıca saklanıyor."
             ),
             samples=samples,
         ),

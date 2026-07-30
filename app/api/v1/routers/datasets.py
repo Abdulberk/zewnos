@@ -14,6 +14,7 @@ from app.api.mappers import (
     risk_out,
     severity_counts,
 )
+from app.api.responses import UPLOAD_ERRORS
 from app.schemas.common import QualityReportOut
 from app.schemas.dataset import (
     DatasetSummary,
@@ -25,21 +26,21 @@ from app.schemas.dataset import (
 )
 from app.services.registry import get_pack
 
-router = APIRouter(prefix="/datasets", tags=["datasets"])
+router = APIRouter(prefix="/datasets", tags=["datasets"], responses=UPLOAD_ERRORS)
 
 
 @router.post(
     "",
     response_model=UploadResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="CSV yukle ve isle",
+    summary="CSV yükle ve işle",
 )
 async def upload_dataset(
     service: DatasetServiceDep,
-    file: UploadFile = File(..., description="Islenecek CSV dosyasi"),
+    file: UploadFile = File(..., description="İşlenecek CSV dosyası"),
     pack: str | None = Form(
         None,
-        description="Rapor tipi (or. 'sonart-erp'). Bos birakilirsa basliklardan tespit edilir.",
+        description="Rapor tipi (ör. 'sonart-erp'). Boş bırakılırsa başlıklardan tespit edilir.",
     ),
 ) -> UploadResponse:
     raw = await file.read()
@@ -53,13 +54,13 @@ async def upload_dataset(
     )
 
 
-@router.get("", response_model=list[DatasetSummary], summary="Yuklenmis veri setleri")
+@router.get("", response_model=list[DatasetSummary], summary="Yüklenmiş veri setleri")
 async def list_datasets(service: DatasetServiceDep) -> list[DatasetSummary]:
     records = await service.list()
     return [dataset_summary(record, get_pack(record.pack_key)) for record in records]
 
 
-@router.get("/{dataset_id}", response_model=DatasetSummary, summary="Veri seti ozeti")
+@router.get("/{dataset_id}", response_model=DatasetSummary, summary="Veri seti özeti")
 async def get_dataset(loaded: LoadedDatasetDep) -> DatasetSummary:
     return dataset_summary(loaded.record, loaded.pack)
 
@@ -80,7 +81,7 @@ async def delete_dataset(dataset_id: str, service: DatasetServiceDep) -> Respons
     response_model=QualityReportOut,
     summary="Veri kalitesi raporu",
     description=(
-        "Tespit edilen her sorun; agirligi, kac satiri etkiledigi ve **ne yapildigi** "
+        "Tespit edilen her sorun; ağırlığı, kaç satırı etkilediği ve **ne yapıldığı** "
         "(onarildi / turetildi / silindi / karantina / isaretlendi) ile birlikte."
     ),
 )
@@ -88,10 +89,10 @@ async def get_quality(loaded: LoadedDatasetDep) -> QualityReportOut:
     return quality_out(loaded.quality)
 
 
-@router.get("/{dataset_id}/overview", response_model=OverviewResponse, summary="Dashboard ozeti")
+@router.get("/{dataset_id}/overview", response_model=OverviewResponse, summary="Dashboard özeti")
 async def get_overview(
     loaded: LoadedDatasetDep,
-    top: int = Query(8, ge=1, le=50, description="Donulecek risk sayisi"),
+    top: int = Query(8, ge=1, le=50, description="Dönülecek risk sayısı"),
 ) -> OverviewResponse:
     result = loaded.analytics
     return OverviewResponse(
@@ -100,7 +101,7 @@ async def get_overview(
         entity_count=result.entity_count,
         headline_metrics=[metric_out(m) for m in result.headline_metrics],
         period_rows=list(result.period_rows),
-        risk_counts_by_severity=severity_counts(result),
+        risk_counts_by_severity=severity_counts(result.risks),
         top_risks=[risk_out(r) for r in result.risks[:top]],
     )
 
@@ -108,7 +109,7 @@ async def get_overview(
 @router.get(
     "/{dataset_id}/periods",
     response_model=PeriodsResponse,
-    summary="Donemsel trend ve degisim verisi",
+    summary="Dönemsel trend ve değişim verisi",
 )
 async def get_periods(loaded: LoadedDatasetDep) -> PeriodsResponse:
     result = loaded.analytics
@@ -123,11 +124,11 @@ async def get_periods(loaded: LoadedDatasetDep) -> PeriodsResponse:
 @router.get(
     "/{dataset_id}/entities",
     response_model=EntitiesResponse,
-    summary="Kayit bazinda ozet ve zaman serisi",
+    summary="Kayıt bazında özet ve zaman serisi",
 )
 async def get_entities(
     loaded: LoadedDatasetDep,
-    include_series: bool = Query(True, description="(kayit, donem) uzun tablosunu da dondur"),
+    include_series: bool = Query(True, description="(kayıt, dönem) uzun tablosunu da döndür"),
 ) -> EntitiesResponse:
     result = loaded.analytics
     pack = loaded.pack
@@ -144,8 +145,8 @@ async def get_entities(
 @router.get("/{dataset_id}/risks", response_model=RisksResponse, summary="Risk sicili")
 async def get_risks(
     loaded: LoadedDatasetDep,
-    severity: str | None = Query(None, description="Agirliga gore filtre, or. 'kritik'"),
-    period: str | None = Query(None, description="Yalnizca bu donemde acilan riskler"),
+    severity: str | None = Query(None, description="Ağırlığa göre filtre, ör. 'kritik'"),
+    period: str | None = Query(None, description="Yalnızca bu dönemde açılan riskler"),
 ) -> RisksResponse:
     result = loaded.analytics
     risks = list(result.risks)
@@ -157,7 +158,7 @@ async def get_risks(
     return RisksResponse(
         total=len(risks),
         total_financial_impact_tl=round(sum(r.financial_impact_tl or 0.0 for r in risks), 2),
-        by_severity=severity_counts(result),
-        by_code=code_counts(result),
+        by_severity=severity_counts(risks),
+        by_code=code_counts(risks),
         risks=[risk_out(r) for r in risks],
     )

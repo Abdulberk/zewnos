@@ -18,6 +18,7 @@ from app.domain.packs.base import (
     Aggregate,
     ColumnDef,
     DatasetPack,
+    Department,
     DerivedMetric,
     ImputationRule,
     IntegrityRule,
@@ -315,7 +316,7 @@ INTEGRITY_RULES = (
     ),
     IntegrityRule(
         code="COST_SPIKE",
-        title="Birim maliyette ani sicrama",
+        title="Birim maliyette ani sıçrama",
         severity=Severity.ORTA,
         action=IssueAction.ISARETLENDI,
         violation=lambda _: pl.col("maliyet_mom_yuzde") > MALIYET_SOK_YUZDE,
@@ -599,7 +600,7 @@ def _stockout_narrative(row: RowMapping) -> str:
     )
     if ilk and son and ilk > son:
         metin += (
-            f" Tükenmeden önceki dönemsel çıkış {ilk:.0f} adetken simdi {son:.0f} adete "
+            f" Tükenmeden önceki dönemsel çıkış {ilk:.0f} adetken şimdi {son:.0f} adete "
             "düşmüş; aradaki fark kaçırılan satış."
         )
     return metin
@@ -742,7 +743,7 @@ RISK_RULES = (
         predicate=lambda _: pl.col("maliyet_degisim_yuzde") > MALIYET_SOK_YUZDE,
         narrative=lambda row: (
             f"Birim maliyet dönem başından bu yana %{_num(row, 'maliyet_degisim_yuzde'):.1f} "
-            f"artti ve {_num(row, 'son_birim_maliyet'):.0f} TL seviyesine oturdu."
+            f"arttı ve {_num(row, 'son_birim_maliyet'):.0f} TL seviyesine oturdu."
         ),
         recommendation=(
             "Fiyat listesini gözden geçirin; maliyet artışı kalıcı ise fiyata " "yansıtılmalı."
@@ -762,7 +763,7 @@ RISK_RULES = (
             f"Her dönem ortalama {_num(row, 'stok_trend_step'):.0f} adet stok birikiyor: "
             f"giriş çıkışı aşıyor ve talep artmıyor. Tek bir dönem alarma geçmiyor ama "
             f"trend {_num(row, 'ilk_stok'):.0f} adetten {_num(row, 'son_stok'):.0f} adete "
-            "cikmis durumda."
+            "çıkmış durumda."
         ),
         recommendation="Sipariş miktarını çıkış hızına eşitleyin; aksi halde ölü stoğa dönüşür.",
         evidence_metrics=("stok_trend_step", "net_akis_toplam", "ilk_stok", "son_stok"),
@@ -773,7 +774,7 @@ RISK_RULES = (
     ),
     RiskRule(
         code="DEMAND_SURGE",
-        title="Talep hizlaniyor",
+        title="Talep hızlanıyor",
         severity=Severity.ORTA,
         predicate=lambda _: (pl.col("cikis_trend_step") > 0)
         & (pl.col("ilk3_cikis_ort") > 0)
@@ -798,7 +799,7 @@ RISK_RULES = (
         & (pl.col("ortalama_cikis") > 0)
         & (pl.col("zirve_cikis") > pl.col("ortalama_cikis") * 1.2),
         narrative=lambda row: (
-            f"Çıkış {row.get('zirve_donem')} doneminde {_num(row, 'zirve_cikis'):.0f} adetle "
+            f"Çıkış {row.get('zirve_donem')} döneminde {_num(row, 'zirve_cikis'):.0f} adetle "
             f"zirve yaptı; dönem ortalaması {_num(row, 'ortalama_cikis'):.0f} adet. "
             "Düz bir trend değil, mevsimsel bir hareket var."
         ),
@@ -837,7 +838,12 @@ PROMPT_PROFILE = PromptProfile(
     domain_label="ERP stok ve satış raporu",
     entity_noun="urun",
     entity_noun_plural="urunler",
-    departments=("satinalma", "uretim", "satis", "finans"),
+    departments=(
+        Department("satinalma", "Satın Alma"),
+        Department("uretim", "Üretim"),
+        Department("satis", "Satış"),
+        Department("finans", "Finans"),
+    ),
     kpi_glossary={
         "kapama_ay": "Mevcut stoğun son 3 dönemin ortalama çıkış hızında kaç ay yeteceği.",
         "marj_yuzde": "Birim bazında brüt kâr yüzdesi: (satış - maliyet) / satış.",

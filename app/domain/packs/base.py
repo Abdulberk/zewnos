@@ -199,6 +199,20 @@ class Aggregate:
 # AI prompt profili
 # ---------------------------------------------------------------------------
 @dataclass(frozen=True, slots=True)
+class Department:
+    """Aksiyon sahibi departman.
+
+    `key` sozlesme degeridir: modele verilen izinli liste ve API yanitindaki
+    `owner` alani budur; ASCII ve degismez, cunku istemci buna gore dallanir.
+    `label` yalnizca gosterim icindir. Ikisini ayirmak, ekranda "uretim"
+    yazmasini ve etiketi degistirince istemcinin kirilmasini birlikte onler.
+    """
+
+    key: str
+    label: str
+
+
+@dataclass(frozen=True, slots=True)
 class PromptProfile:
     """Pack'e ozgu AI dili.
 
@@ -210,10 +224,22 @@ class PromptProfile:
     domain_label: str
     entity_noun: str
     entity_noun_plural: str
-    departments: tuple[str, ...]
+    departments: tuple[Department, ...]
     kpi_glossary: Mapping[str, str]
     dynamics: tuple[str, ...]
     action_style: str
+
+    @property
+    def department_keys(self) -> tuple[str, ...]:
+        """Modele verilen izinli deger listesi."""
+        return tuple(d.key for d in self.departments)
+
+    def department_label(self, key: str) -> str:
+        """Gosterim etiketi; taninmayan anahtar oldugu gibi geri doner."""
+        for department in self.departments:
+            if department.key == key:
+                return department.label
+        return key
 
 
 # ---------------------------------------------------------------------------

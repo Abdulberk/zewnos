@@ -17,6 +17,7 @@ analizinde en sik ve en sessiz hata budur.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import polars as pl
@@ -31,6 +32,8 @@ from app.domain.models import (
     Severity,
 )
 from app.domain.packs.base import DatasetPack
+
+_log = logging.getLogger(__name__)
 
 # Motorun her entity icin urettigi standart trend kolonlari.
 # Pack'lerin risk kurallari bu adlara guvenebilir.
@@ -192,9 +195,13 @@ def _evaluate_risks(entity_summary: pl.DataFrame, pack: DatasetPack) -> tuple[Ri
     findings: list[RiskFinding] = []
 
     for rule in pack.risk_rules:
+        # Kural bir kolon adini yanlis yazmis olabilir. Bunu yutmak "risk yok"
+        # gibi gorunur -- pack yazarken en tehlikeli sessiz hata bu. Kural
+        # calismazsa diger kurallar yine degerlendirilir ama iz birakilir.
         try:
             matched = entity_summary.filter(rule.predicate(ctx).fill_null(False))
         except Exception:
+            _log.warning("risk_kurali_calistirilamadi", extra={"kural": rule.code}, exc_info=True)
             continue
 
         for row in matched.iter_rows(named=True):
@@ -328,7 +335,7 @@ def _top_movers(
         return tuple(
             MetricValue(
                 metric=f"{trend_col}_change",
-                label=f"{label} degisimi",
+                label=f"{label} değişimi",
                 value=float(row["__change"]),
                 unit=unit,
                 entity=str(row[ctx.entity_key]),

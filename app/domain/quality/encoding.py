@@ -155,7 +155,7 @@ def decode_bytes(raw: bytes) -> DecodeResult:
 
     return DecodeResult(
         text=repaired,
-        encoding=f"{used_encoding} (mojibake onarildi)",
+        encoding=f"{used_encoding} (mojibake onarıldı)",
         repaired=True,
         repaired_samples=_sample_repairs(text, repaired),
         suspect_unrepaired=False,
@@ -172,4 +172,4 @@ def _decode_with_fallback(raw: bytes) -> tuple[str, str]:
             return raw.decode(encoding, errors="replace"), f"{encoding} (chardet tahmini)"
     except Exception:
         pass
-    return raw.decode("latin-1", errors="replace"), "latin-1 (son care)"
+    return raw.decode("latin-1", errors="replace"), "latin-1 (son çare)"

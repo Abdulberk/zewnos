@@ -54,7 +54,7 @@ def build_system_prompt(pack: DatasetPack) -> str:
     profile = pack.prompt_profile
     glossary = "\n".join(f"- **{k}**: {v}" for k, v in profile.kpi_glossary.items())
     dynamics = ", ".join(profile.dynamics)
-    departments = ", ".join(profile.departments)
+    departments = ", ".join(profile.department_keys)
 
     return f"""{profile.persona}
 

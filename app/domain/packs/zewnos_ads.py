@@ -18,6 +18,7 @@ from app.domain.packs.base import (
     Aggregate,
     ColumnDef,
     DatasetPack,
+    Department,
     DerivedMetric,
     ImputationRule,
     IntegrityRule,
@@ -423,7 +424,7 @@ RISK_RULES = (
         ),
         recommendation=(
             "Kampanyayı durdurun. Kreatifi yenileyip kitleyi genişletmeden bütçe "
-            "koymayin; mevcut haliyle her ek lira daha az geri donuyor."
+            "koymayın; mevcut haliyle her ek lira daha az geri dönüyor."
         ),
         evidence_metrics=(
             "ilk_frekans",
@@ -452,7 +453,7 @@ RISK_RULES = (
         ),
         recommendation=(
             "Bütçeyi ölçekleme öncesi seviyeye çekin. Ek bütçeyi ROAS'ı yüksek "
-            "kampanyalara aktarin."
+            "kampanyalara aktarın."
         ),
         evidence_metrics=(
             "ilk_harcama_tl",
@@ -473,7 +474,7 @@ RISK_RULES = (
         narrative=lambda row: (
             f"Son dönem ROAS {_num(row, 'son_roas'):.2f}: harcanan her 1 TL "
             f"{_num(row, 'son_roas'):.2f} TL geri getiriyor. Altı dönemde toplam net "
-            f"katki {_tl(_num(row, 'net_katki_tl'))}."
+            f"katkı {_tl(_num(row, 'net_katki_tl'))}."
         ),
         recommendation=(
             "Durdurun ya da hedefleme/kreatif tamamen yenilenene kadar bütçeyi " "minimuma çekin."
@@ -491,7 +492,7 @@ RISK_RULES = (
         narrative=lambda row: (
             f"ROAS {_num(row, 'son_roas'):.2f} ve frekans {_num(row, 'son_frekans'):.1f} -- "
             "kitle henüz doymamış. Bu kampanya ek bütçeyi verimli çevirebilecek "
-            f"durumda; şu an aylık {_tl(_num(row, 'son_harcama_tl'))} harciyor."
+            f"durumda; şu an aylık {_tl(_num(row, 'son_harcama_tl'))} harcıyor."
         ),
         recommendation=(
             "Bütçeyi kademeli artırın (%20-30 adımlarla) ve her adımda ROAS ile "
@@ -524,7 +525,7 @@ RISK_RULES = (
         & (pl.col("roas_degisim_yuzde") > -10.0)
         & (pl.col("son_roas") > ROAS_ZARAR),
         narrative=lambda row: (
-            f"Harcama %{_num(row, 'harcama_degisim_yuzde'):.0f} arttigi halde ROAS "
+            f"Harcama %{_num(row, 'harcama_degisim_yuzde'):.0f} arttığı halde ROAS "
             f"{_num(row, 'ilk_roas'):.2f} -> {_num(row, 'son_roas'):.2f} seviyesinde korundu. "
             "Ölçekleme verimi bozmadı; mevsimsel talep gerçek."
         ),
@@ -540,7 +541,7 @@ RISK_RULES = (
         predicate=lambda _: (pl.col("son_cvr") < 2.0) & (pl.col("son_roas") < ROAS_YILDIZ),
         narrative=lambda row: (
             f"Dönüşüm oranı %{_num(row, 'son_cvr'):.2f}: tıklama geliyor ama satışa "
-            f"donmuyor. CPA {_tl(_num(row, 'son_cpa'))}."
+            f"dönmüyor. CPA {_tl(_num(row, 'son_cpa'))}."
         ),
         recommendation=(
             "Landing sayfası ve ürün-kitle uyumunu gözden geçirin; sorun reklamda " "olmayabilir."
@@ -560,7 +561,12 @@ PROMPT_PROFILE = PromptProfile(
     domain_label="Meta/Instagram reklam performans raporu",
     entity_noun="kampanya",
     entity_noun_plural="kampanyalar",
-    departments=("medya_alimi", "kreatif", "e_ticaret", "finans"),
+    departments=(
+        Department("medya_alimi", "Medya Alımı"),
+        Department("kreatif", "Kreatif"),
+        Department("e_ticaret", "E-ticaret"),
+        Department("finans", "Finans"),
+    ),
     kpi_glossary={
         "roas": "Gelir / harcama. 1'in altında kampanya para kaybediyor demektir.",
         "frekans": "Aynı kişinin reklamı kaç kez gördüğü. 2.5 üstü kitle yorulması sinyali.",

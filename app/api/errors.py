@@ -31,7 +31,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             status_code=422,
             content={
                 "code": "validation_error",
-                "message": "Istek govdesi ya da parametreleri gecersiz.",
+                "message": "İstek gövdesi ya da parametreleri geçersiz.",
                 "details": {"errors": exc.errors()},
             },
         )
@@ -44,7 +44,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             status_code=500,
             content={
                 "code": "internal_error",
-                "message": "Beklenmeyen bir hata olustu. Kayitlar incelenmeli.",
+                "message": "Beklenmeyen bir hata oluştu. Kayıtlar incelenmeli.",
                 "details": {},
             },
         )

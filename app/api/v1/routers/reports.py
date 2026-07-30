@@ -6,19 +6,20 @@ from fastapi import APIRouter, Query
 from fastapi.responses import Response
 
 from app.api.deps import AnalysisServiceDep, LoadedDatasetDep
+from app.api.responses import COMMON_ERRORS
 from app.services.report_service import build_report
 
-router = APIRouter(prefix="/datasets/{dataset_id}", tags=["reports"])
+router = APIRouter(prefix="/datasets/{dataset_id}", tags=["reports"], responses=COMMON_ERRORS)
 
 
 @router.get(
     "/report.pdf",
-    summary="Paylasilabilir yonetici raporu (PDF)",
+    summary="Paylaşılabilir yönetici raporu (PDF)",
     description=(
-        "KPI'lar, donemsel trend, risk sicili ve veri kalitesi notlari. "
-        "AI analizi onbellekte varsa yonetici ozeti ve doneme ozgu aksiyonlar da "
-        "eklenir; yoksa rapor yalnizca hesaplanmis verilerle uretilir ve AI "
-        "cagrisi yapilmaz."
+        "KPI'lar, dönemsel trend, risk sicili ve veri kalitesi notları. "
+        "AI analizi önbellekte varsa yönetici özeti ve döneme özgü aksiyonlar da "
+        "eklenir; yoksa rapor yalnızca hesaplanmış verilerle üretilir ve AI "
+        "çağrısı yapılmaz."
     ),
     response_class=Response,
     responses={200: {"content": {"application/pdf": {}}}},
@@ -28,7 +29,7 @@ async def download_report(
     loaded: LoadedDatasetDep,
     service: AnalysisServiceDep,
     include_ai: bool = Query(
-        True, description="Onbellekteki AI analizini rapora dahil et (yeni cagri yapmaz)"
+        True, description="Önbellekteki AI analizini rapora dahil et (yeni çağrı yapmaz)"
     ),
 ) -> Response:
     analysis = None

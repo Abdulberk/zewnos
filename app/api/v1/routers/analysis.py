@@ -5,6 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Query
 
 from app.api.deps import AnalysisServiceDep, LoadedDatasetDep, SettingsDep
+from app.api.responses import AI_ERRORS
 from app.schemas.analysis import (
     AnalysisResponse,
     AnalysisStatusResponse,
@@ -12,16 +13,16 @@ from app.schemas.analysis import (
     AskResponse,
 )
 
-router = APIRouter(prefix="/datasets/{dataset_id}", tags=["analysis"])
+router = APIRouter(prefix="/datasets/{dataset_id}", tags=["analysis"], responses=AI_ERRORS)
 
 
 @router.get(
     "/analysis/status",
     response_model=AnalysisStatusResponse,
-    summary="Analiz hazir mi, kac cagri gerekecek",
+    summary="Analiz hazır mı, kaç çağrı gerekecek",
     description=(
-        "Frontend'in 'analiz uret' butonunu maliyet uyarisiyla gostermesi icin. "
-        "Onbellekte varsa cagri yapilmayacagini bildirir."
+        "Frontend'in 'analiz üret' butonunu maliyet uyarısıyla göstermesi için. "
+        "Önbellekte varsa çağrı yapılmayacağını bildirir."
     ),
 )
 async def analysis_status(
@@ -48,11 +49,11 @@ async def analysis_status(
 @router.post(
     "/analysis",
     response_model=AnalysisResponse,
-    summary="Donemsel analiz + yonetici ozeti uret",
+    summary="Dönemsel analiz + yönetici özeti üret",
     description=(
-        "Her donem icin paralel bir AI cagrisi, ardindan tek bir sentez cagrisi. "
-        "Sonuc onbellege yazilir; ayni veri seti icin tekrar cagrildiginda AI'a "
-        "gidilmez. `refresh=true` ile yeniden uretilebilir."
+        "Her dönem için paralel bir AI çağrısı, ardından tek bir sentez çağrısı. "
+        "Sonuç önbelleğe yazılır; aynı veri seti için tekrar çağrıldığında AI'a "
+        "gidilmez. `refresh=true` ile yeniden üretilebilir."
     ),
 )
 async def create_analysis(
@@ -60,7 +61,7 @@ async def create_analysis(
     loaded: LoadedDatasetDep,
     service: AnalysisServiceDep,
     settings: SettingsDep,
-    refresh: bool = Query(False, description="Onbellegi yok say ve yeniden uret"),
+    refresh: bool = Query(False, description="Önbelleği yok say ve yeniden üret"),
 ) -> AnalysisResponse:
     payload = await service.analyze(loaded, refresh=refresh)
     return AnalysisResponse(
@@ -80,10 +81,10 @@ async def create_analysis(
 @router.post(
     "/ask",
     response_model=AskResponse,
-    summary="Veri uzerinde serbest soru-cevap",
+    summary="Veri üzerinde serbest soru-cevap",
     description=(
-        "Model SQL yazmaz: hesaplanmis tablolari yorumlar. Boylece 'AI sayi "
-        "hesaplamaz' kurali soru-cevapta da korunur ve her yanit kanit tasir."
+        "Model SQL yazmaz: hesaplanmış tabloları yorumlar. Böylece 'AI sayı "
+        "hesaplamaz' kuralı soru-cevapta da korunur ve her yanıt kanıt taşır."
     ),
 )
 async def ask(

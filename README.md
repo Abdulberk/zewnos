@@ -8,9 +8,16 @@
 
 ---
 
-## Ekran görüntüleri
+## Depolar ve çıktılar
 
-> Frontend ayrı bir workspace'te Next.js ile geliştiriliyor. Aşağıdaki görseller eklenecek:
+| | |
+|---|---|
+| **Backend (bu depo)** | <https://github.com/Abdulberk/zewnos> |
+| **Frontend** | <https://github.com/Abdulberk/erp-fe> — Next.js dashboard |
+| **Örnek çıktı** | [`docs/ornek-rapor.pdf`](docs/ornek-rapor.pdf) — gerçek veriyle üretilmiş yönetici raporu |
+| **API arayüzü** | Kurulumdan sonra <http://localhost:8000/docs> — 14 ucun tamamı denenebilir |
+
+### Ekran görüntüleri
 
 | | |
 |---|---|
@@ -20,10 +27,8 @@
 | `docs/screenshots/04-donemsel-analiz.png` | Döneme özgü AI analizi ve aksiyonlar |
 | `docs/screenshots/05-soru-cevap.png` | Veri üzerinde serbest soru-cevap |
 
-Backend'in kendi arayüzü de var — kurulumdan sonra <http://localhost:8000/docs>
-adresinde tüm uçlar denenebilir.
-
-**Ekran kaydı:** `<link eklenecek>`
+**Ekran kaydı:** kısa gezinti videosu — dashboard, veri kalitesi paneli, risk sicili
+ve soru-cevap.
 
 ---
 
@@ -33,7 +38,7 @@ Gereken: **Python 3.12+**. Docker, veritabanı sunucusu veya başka bir servis g
 
 ```bash
 # 1. Depoyu alın
-git clone <repo-url> && cd zewnos
+git clone https://github.com/Abdulberk/zewnos.git && cd zewnos
 
 # 2. Sanal ortam
 python -m venv .venv
@@ -70,7 +75,7 @@ açılır; veri işleme, dashboard ve PDF export çalışır, yalnızca AI uçla
 
 ```bash
 pip install -r requirements-dev.txt
-pytest              # 93 test
+pytest              # 106 test
 lint-imports        # katman sınırı sözleşmeleri
 ruff check app tests
 ```
@@ -160,7 +165,7 @@ hesaplanmış ve `app/ai/context.py` üzerinden geçmiş durumda. Model hesaplay
    dörtlüsü hesaplanmış tablolarda aranıp karşılaştırılıyor. Sonuç bir
    **grounding oranı** olarak API yanıtında dönüyor.
 
-Örnek veride ölçülen: **%100 (126/126 kanıt doğrulandı).**
+Örnek veride ölçülen: **%100 (127/127 kanıt doğrulandı).**
 
 ---
 
@@ -340,6 +345,12 @@ Aynı dönem, aynı bağlam, `effort=medium`, tek değişken model:
 | **Tam analiz (7 çağrı)** | **~$0,72** | **~$0,22** |
 | Grounding | %100 | %100 |
 
+> Tam analiz rakamları prompt önbelleğinin tamamen ısınmış olduğu durumu
+> gösteriyor (7/7 isabet). Soğuk koşuda paylaşılan bağlam bir kez yazıldığı
+> için maliyet yükseliyor: son ölçülen soğuk Sonnet koşusu **$0,3547**
+> (5/7 isabet, 115 sn, grounding %100). Aradaki fark bir sonraki bölümde
+> anlatılan önbellek sırasının neden önemli olduğunu da gösteriyor.
+
 Sonnet 5 **~3x ucuz ve 2x hızlı**. İlk ölçümde bir kalite farkı da vardı:
 Sonnet bir **dönemsel atıf hatası** yaptı — 2026-03 analizinde U003 için
 *"3 dönemdir stok sıfır"* dedi; oysa U003'ün Mart stoğu 30, sıfıra Nisan'da
@@ -509,7 +520,7 @@ Bunu söylemekle bırakmadım; `import-linter` sözleşmesiyle doğrulanıyor:
 
 ```
 $ lint-imports
-Analyzed 76 files, 218 dependencies.
+Analyzed 77 files, 229 dependencies.
 
 Katmanlı mimari (api -> services -> domain)   KEPT
 Domain katmanı çerçeveden bağımsız            KEPT
@@ -544,7 +555,7 @@ app/
 
 ## Testler
 
-**93 test.** Vurgu "yeşil sayısı" değil, *doğru sayıyı* kontrol etmekte:
+**106 test.** Vurgu "yeşil sayısı" değil, *doğru sayıyı* kontrol etmekte:
 
 ```python
 def test_eksik_donem_sonu_stogu_mutabakattan_turetilir(...):
@@ -588,7 +599,7 @@ doğrulayıcısının kendisi de test ediliyor.
 | Anomali / veri kalitesi tespiti | ✅ 11 kural, her biri "ne yapıldı" bilgisiyle |
 | Veri üzerinde serbest soru-cevap | ✅ `POST /datasets/{id}/ask` |
 | PDF / paylaşılabilir export | ✅ `GET /datasets/{id}/report.pdf` |
-| Test yazımı / edge-case | ✅ 93 test |
+| Test yazımı / edge-case | ✅ 106 test |
 
 ### Soru-cevap: text-to-SQL **değil**
 
