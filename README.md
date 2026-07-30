@@ -19,35 +19,15 @@
 
 ### Ekran görüntüleri
 
-Aşağıdaki kareler örnek veriyle (`sonart_erp_bozuk_encoding.csv`) çalışan
-uygulamadan alınmıştır.
+![Dashboard](docs/screenshots/01-dashboard.png)
 
-**Genel bakış** — son dönemin KPI'ları, 6 aylık trend grafikleri ve en kritik
-riskler. Ciro (TL) ile marj (%) farklı ölçekler olduğu için bilerek ayrı
-grafiklerde, ortak x ekseniyle.
+![Veri kalitesi](docs/screenshots/02-veri-kalitesi.png)
 
-![Dashboard: KPI kartları ve 6 aylık trend grafikleri](docs/screenshots/01-dashboard.png)
+![Risk sicili](docs/screenshots/03-risk-sicili.png)
 
-**Veri kalitesi** — her bulgu, *ne yapıldığı* rozetiyle birlikte. Bozuk
-karakter kodlaması onarımının öncesi/sonrası örnekleri burada görünüyor.
+![Dönemsel AI analizi](docs/screenshots/04-donemsel-analiz.png)
 
-![Veri kalitesi paneli: bulgular ve yapılan işlemler](docs/screenshots/02-veri-kalitesi.png)
-
-**Risk sicili** — parasal etkiye göre sıralı 18 risk. Açılan kayıtta gerekçe,
-öneri ve her iddianın dayandığı hesaplanmış sayılar.
-
-![Risk sicili: parasal etki grafiği ve kanıtlar](docs/screenshots/03-risk-sicili.png)
-
-**Dönemsel AI analizi** — altı dönemin her biri için ayrı hikâye ve aksiyonlar.
-`delta_vs_prev` şemada zorunlu olduğu için model her dönemde *ne değiştiğini*
-söylemek zorunda; dönemsel farklılaşma bu sayede görünür.
-
-![Dönemsel AI analizi: yönetici özeti ve döneme özgü aksiyonlar](docs/screenshots/04-donemsel-analiz.png)
-
-**Soru-cevap** — serbest soru, kanıtlı yanıt, güven rozeti ve kanıt doğrulama
-oranı.
-
-![Soru-cevap: kanıtlı yanıt ve doğrulama oranı](docs/screenshots/05-soru-cevap.png)
+![Soru-cevap](docs/screenshots/05-soru-cevap.png)
 
 ---
 
