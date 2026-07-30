@@ -740,20 +740,26 @@ Tüm hatalar aynı gövdeyi döner — istemci `code` alanına göre dallanır:
 
 ## Mimari kararlar (ADR)
 
-Her önemli karar için kısa bir kayıt: bağlam → seçilen → değerlendirilen
-alternatifler → neden elendi → ödünler.
+**ADR** (*Architecture Decision Record*), önemli bir teknik kararın **neden öyle
+verildiğini** kayda geçiren kısa bir nottur. Amaç basit: altı ay sonra biri
+"burada neden bu var?" diye sorduğunda cevabı kodun içinden çıkarmaya
+çalışmasın. Kararın kendisi kadar **neyden vazgeçildiği** de yazılı.
 
-| | |
+On dosyanın hepsi aynı iskeleti taşır:
+**bağlam → seçilen → değerlendirilen alternatifler → neden elendi → ödünler.**
+
+| Karar | Ne kararlaştırıldı, neden |
 |---|---|
-| [ADR-002](docs/decisions/ADR-002-fastapi.md) | FastAPI  |
-| [ADR-003](docs/decisions/ADR-003-polars.md) | Polars |
-| [ADR-004](docs/decisions/ADR-004-pydantic.md) | Pydantic v2 |
-| [ADR-005](docs/decisions/ADR-005-sqlite.md) | SQLite |
-| [ADR-006](docs/decisions/ADR-006-model-secimi.md) | Claude Opus 5 / Sonnet 5 |
-| [ADR-007](docs/decisions/ADR-007-ai-sayi-hesaplamaz.md) | **AI sayı hesaplamaz** |
-| [ADR-008](docs/decisions/ADR-008-no-orchestration-framework.md) | Orkestrasyon framework'ü kullanılmadı |
-| [ADR-009](docs/decisions/ADR-009-dataset-pack.md) | Dataset Pack soyutlaması |
-| [ADR-010](docs/decisions/ADR-010-katman-sinirlari.md) | Katman sınırları CI ile zorlanıyor |
+| [**ADR-001**](docs/decisions/ADR-001-track-secimi.md)<br>Hangi track | **Track B.** Ödevin asıl hedefi *"300+ raporu yönetici dashboard'una çevirmek"*; bu, tek bir raporu değil **rapordan bağımsız bir hat** yazmayı gerektiriyor. |
+| [**ADR-002**](docs/decisions/ADR-002-fastapi.md)<br>Web çatısı | **FastAPI.** Litestar ölçümlerde biraz daha hızlı ama olgun ekosistem ve `Depends` ile hazır gelen bağımlılık enjeksiyonu ağır bastı. |
+| [**ADR-003**](docs/decisions/ADR-003-polars.md)<br>Veri işleme | **Polars**, pandas yerine. Hız ikincil sebep; asıl sebep pencere hesaplarında **grup sınırını koruması** — zaman serisi analizinde en sessiz hata kaynağı budur. |
+| [**ADR-004**](docs/decisions/ADR-004-pydantic.md)<br>Şema ve doğrulama | **Pydantic v2.** msgspec daha hızlı, ama Anthropic SDK'sının yapılandırılmış çıktısı Pydantic modeli bekliyor; şemayı iki kez yazmaya değmez. |
+| [**ADR-005**](docs/decisions/ADR-005-sqlite.md)<br>Veritabanı | **SQLite + aiosqlite.** Değerlendiren kişi `pip install` dışında hiçbir şey kurmasın diye. Postgres'e geçiş tek satır — SQLAlchemy bu yüzden var. |
+| [**ADR-006**](docs/decisions/ADR-006-model-secimi.md)<br>Hangi model | **Varsayılan Sonnet 5**, ortam değişkeniyle Opus 5. Karar tahmine değil ölçüme dayanıyor: aynı analizde ~3x ucuz, ~2x hızlı, aynı doğrulama oranı. |
+| [**ADR-007**](docs/decisions/ADR-007-ai-sayi-hesaplamaz.md)<br>**AI sayı hesaplamaz** | Projenin taşıyıcı kuralı. Modele ham CSV **hiç verilmiyor**; gördüğü her sayı Polars'ın hesapladığı tablolardan geliyor. Hesaplayamaz, çünkü hesaplayacağı veriye erişimi yok. |
+| [**ADR-008**](docs/decisions/ADR-008-no-orchestration-framework.md)<br>Orkestrasyon | **LangChain/LangGraph kullanılmadı.** İş, 7 çağrılık sabit ve dallanmayan bir akış; framework'ün getireceği soyutlama karşılığını vermiyor, hata ayıklamayı zorlaştırıyor. |
+| [**ADR-009**](docs/decisions/ADR-009-dataset-pack.md)<br>Dataset Pack | Rapora özgü **her şey** tek bir donmuş nesnede. Yeni rapor tipi = yeni bir nesne; motora, uçlara ve AI katmanına dokunulmuyor. Neden `Protocol` değil de `dataclass` olduğu da burada. |
+| [**ADR-010**](docs/decisions/ADR-010-katman-sinirlari.md)<br>Katman sınırları | *"Domain katmanı çerçeveden bağımsızdır"* bir temenni değil; `import-linter` ile CI'da kontrol edilen **üç sözleşme**. İhlal edilirse derleme kırılır. |
 
 ---
 
