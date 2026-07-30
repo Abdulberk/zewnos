@@ -185,6 +185,39 @@ def test_ic_kolonlar_baglama_konmaz(sonart_result: AnalyticsResult, sonart_pack:
     assert "talep_patlama_donem" not in context
 
 
+def test_donem_sorusu_o_doneme_ait_anlik_goruntu_icerir(
+    sonart_result: AnalyticsResult, sonart_pack: DatasetPack
+):
+    """Modelin seri toplamini tek bir doneme atfetmesini onleyen mekanizma.
+
+    Gercek hata: model 2026-03 analizinde U003 icin "3 donemdir stok sifir"
+    dedi. `sifir_stok_donem = 3` degeri DOGRU ama tum seriye ait; U003'un
+    Mart stogu 30'du. Sebep modelin dikkatsizligi degil, benim ona o donemin
+    kayit bazli degerlerini hic vermemis olmam -- ihtiyaci olan sayiyi
+    bulamayinca eldeki tek degeri odunc aldi.
+
+    Cozum: her donem sorusuna o donemin anlik goruntusu ekleniyor ve iki
+    tablo da kapsamiyla etiketleniyor.
+    """
+    from app.ai.context import build_period_question, build_shared_context
+
+    delta = next(d for d in sonart_result.deltas if d.period == "2026-03")
+    question = build_period_question("2026-03", delta, sonart_result, sonart_pack)
+
+    assert "SADECE BU DONEMIN DEGERLERI" in question
+    # U003'un Mart satiri: stok 30 (sifir DEGIL) -- model artik bunu goruyor
+    u003 = next(line for line in question.splitlines() if line.startswith("| U003"))
+    assert "| 30 |" in u003
+    # U005 ayni donemde gercekten sifir ve arz kisitli
+    u005 = next(line for line in question.splitlines() if line.startswith("| U005"))
+    assert "| 0 |" in u005
+
+    # Seri toplamlarini tasiyan tablo kapsamiyla etiketli olmali
+    shared = build_shared_context(sonart_result, sonart_pack)
+    assert "TUM DONEMLERIN TOPLAMI" in shared
+    assert "tek bir doneme degil" in shared
+
+
 def test_donem_sorusu_yalnizca_o_donemi_hedefler(
     sonart_result: AnalyticsResult, sonart_pack: DatasetPack
 ):

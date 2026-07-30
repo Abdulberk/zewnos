@@ -73,8 +73,32 @@ doğrulayıcımda** çıktı:
   `Döşemelik`) → lookup başarısız oluyordu. Bu bir halüsinasyon değil, yazım
   farkı; normalize edilmesi gerekiyordu.
 
+Üçüncü bulgu aynı dersin tekrarı oldu. Model 2026-03 analizinde U003 için
+*"3 dönemdir stok sıfır"* dedi; Mart stoğu 30'du. `sifir_stok_donem = 3`
+değeri **gerçekti** ama tüm seriye aitti. Sebep modelin dikkatsizliği değil:
+entity özet tablosunu veriyordum ama o döneme ait kayıt bazlı değerleri hiç
+vermiyordum. Model dönem bazlı bir sayıya ihtiyaç duyunca elindeki tek şeyi
+ödünç aldı.
+
+İki düzeltme (`prompt_version` v1 → v2 → v3):
+
+1. Her dönem sorusuna **o dönemin anlık görüntü tablosu** eklendi
+   (`DatasetPack.snapshot_columns`). Ek maliyet dönem başına ~250 token,
+   tam koşuda $0,003.
+2. İki tablo da kapsamıyla etiketlendi (*"TÜM DÖNEMLERİN TOPLAMI"* /
+   *"SADECE BU DÖNEMİN DEĞERLERİ"*) ve sistem promptuna kapsam kuralı girdi.
+3. `Evidence.entity` alanı kırılım (kategori/depo) değerlerini de kapsayacak
+   şekilde tarif edildi — model kategori seviyesi bir değeri doğru alıntılayıp
+   kapsamını boş bırakıyor, doğrulayıcı da onu portföy geneliyle karşılaştırıp
+   yanlış alarm veriyordu.
+
+Düzeltmeden sonra model kapsam ayrımını kendiliğinden yapıyor: *"önce genel
+seri ortalaması %30,48 idi, bu dönemin anlık değeri ondan da kötü."*
+
 Ders: **doğrulama katmanı da bir yazılım ve o da hata yapar.** "AI hata yaptı"
-demeden önce doğrulayıcıyı doğrulamak gerekiyor.
+demeden önce doğrulayıcıyı doğrulamak gerekiyor — ve bir modelin hatası çoğu
+zaman ona verilmemiş bir bilginin izidir. Üç bulgunun üçü de $0 prompt/kod
+düzeltmesiyle çözüldü; hiçbiri için daha pahalı bir model gerekmedi.
 
 ## Sonuçları
 

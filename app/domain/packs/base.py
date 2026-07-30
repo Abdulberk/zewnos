@@ -247,6 +247,16 @@ class DatasetPack:
     entity_trend_column: str = ""
     """Entity ozetinde trend/mover hesaplarinin dayanacagi ana metrik."""
 
+    snapshot_columns: tuple[str, ...] = ()
+    """Bir donem analiz edilirken modele verilecek DONEM BAZLI kolonlar.
+
+    Neden gerekli: entity ozet tablosu tum seriye ait toplamlar tasir
+    (or. "sifir_stok_donem = 3"). Model tek bir donemi anlatirken donem
+    bazli bir sayiya ihtiyac duyup elindeki tek degeri -- seri toplamini --
+    odunc aliyor ve "3 donemdir stok sifir" gibi o doneme ait olmayan bir
+    iddia kuruyor. Cozum modeli uyarmak degil, ihtiyaci olan sayiyi vermek:
+    her donem sorusuna o donemin kayit bazli anlik goruntusu ekleniyor."""
+
     sample_file: str = ""
     extra: Mapping[str, Any] = field(default_factory=dict)
 

@@ -607,5 +607,14 @@ PACK = DatasetPack(
     dimension_aggregates=DIMENSION_AGGREGATES,
     prompt_profile=PROMPT_PROFILE,
     entity_trend_column="harcama_tl",
+    snapshot_columns=(
+        "harcama_tl",
+        "gelir_tl",
+        "roas",
+        "frekans",
+        "ctr",
+        "cvr",
+        "donusum",
+    ),
     sample_file="zewnos_meta_ads_cok_donemli.csv",
 )

@@ -67,8 +67,17 @@ gerektigini* bilmek istiyor.
 1. **Hicbir sayiyi kendin hesaplama.** Sana verilen tablolardaki degerleri
    oldugu gibi kullan. Toplama, oranlama, yuzde cikarma yapma. Bir sayiya
    ihtiyacin varsa ve tablolarda yoksa, o iddiayi kurma.
+1b. **Kapsama dikkat et.** Tablolarin bir kismi TUM DONEMLERI kapsar
+   (or. "5 donemdir stok sifir"), bir kismi TEK BIR DONEMI. Seri geneline
+   ait bir degeri tek bir doneme aitmis gibi anlatma. Bir donemi
+   anlatirken o donemin anlik goruntu tablosunu kullan; seri toplamlarini
+   yalnizca "alti donem boyunca" gibi acikca genel ifadelerle kullan.
 2. **Her aksiyon kanit tasimali.** `evidence` alanina yazdigin her deger
    tablolarda birebir bulunmali; metrik adini da tablodaki teknik adiyla yaz.
+   Kanitin `entity` alanina degerin KAPSAMINI yaz: tek kayitsa kodunu, bir
+   kategori/depo kirilimiyse o boyutun adini, portfoyun tamamiysa bos birak.
+   Kirilim degerini bos birakirsan portfoy geneliyle karisir ve kanit
+   dogrulanamaz.
 3. **Genel tavsiye yasak.** "Stoklari optimize edin" degil, hangi {profile.entity_noun},
    hangi departman, hangi zaman ufku.
 4. **Turkce yaz.** Sade, kisa cumleler. Jargon yerine is dili.
@@ -144,7 +153,16 @@ def build_shared_context(
     entity_rows = _prioritise_entities(result, pack)
     parts += [
         "",
-        f"## {profile.entity_noun_plural.capitalize()} bazinda ozet",
+        f"## {profile.entity_noun_plural.capitalize()} bazinda ozet"
+        " — TUM DONEMLERIN TOPLAMI",
+        (
+            "> Dikkat: bu tablodaki degerler alti donemin tamamina aittir, tek bir "
+            "doneme degil. Ornegin 'sifir_stok_donem = 3' demek *seri boyunca "
+            "toplam 3 donemde* stok sifir olmus demektir; analiz ettigin donemde "
+            "stogun sifir oldugu anlamina GELMEZ. Tek bir donemin degerleri icin "
+            "o donemin sorusundaki anlik goruntu tablosuna bak."
+        ),
+        "",
         markdown_table(entity_rows, entity_cols),
     ]
 
@@ -175,6 +193,26 @@ def _prioritise_entities(result: AnalyticsResult, pack: DatasetPack) -> list[dic
     key = pack.entity_key
     ordered = sorted(result.entity_rows, key=lambda row: str(row.get(key)) not in risky)
     return ordered[:MAX_ENTITY_ROWS]
+
+
+def _period_snapshot(period: str, result: AnalyticsResult, pack: DatasetPack) -> str:
+    """Analiz edilen donemin kayit bazli anlik goruntusu.
+
+    Bilincli olarak degisken (onbelleklenmeyen) kisma konuyor: her donem icin
+    farkli. Maliyeti dusuk (~400 token) ama modelin seri toplamlarini tek bir
+    doneme atfetme egilimini kokunden kaldiriyor -- cunku ihtiyaci olan sayi
+    artik elinde.
+    """
+    if not pack.snapshot_columns:
+        return ""
+
+    rows = [row for row in result.series_rows if row.get(pack.period_key) == period]
+    if not rows:
+        return ""
+
+    columns = [pack.entity_key, pack.entity_label_key, *pack.snapshot_columns]
+    available = [c for c in columns if any(c in row for row in rows)]
+    return markdown_table(rows, available)
 
 
 def _risk_register(result: AnalyticsResult) -> str:
@@ -255,6 +293,20 @@ def build_period_question(
         parts.append("Bu donemde baslayan riskler:")
         for risk in period_risks:
             parts.append(f"- {risk.code} / {risk.entity} {risk.entity_label}: {risk.narrative}")
+
+    snapshot = _period_snapshot(period, result, pack)
+    if snapshot:
+        parts += [
+            "",
+            f"## {period} anlik goruntusu — SADECE BU DONEMIN DEGERLERI",
+            (
+                "Bu donemi anlatirken kayit bazli sayilari BURADAN al. Yukaridaki "
+                "ozet tablosu tum donemleri kapsiyor; bu tablo yalnizca "
+                f"{period} donemini."
+            ),
+            "",
+            snapshot,
+        ]
 
     parts += [
         "",

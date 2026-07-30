@@ -882,5 +882,14 @@ PACK = DatasetPack(
     dimension_aggregates=DIMENSION_AGGREGATES,
     prompt_profile=PROMPT_PROFILE,
     entity_trend_column="cikis_miktar",
+    snapshot_columns=(
+        "donem_sonu_stok",
+        "giris_miktar",
+        "cikis_miktar",
+        "marj_yuzde",
+        "kapama_ay",
+        "birim_maliyet_tl",
+        "arz_kisitli",
+    ),
     sample_file="sonart_erp_cok_donemli.csv",
 )

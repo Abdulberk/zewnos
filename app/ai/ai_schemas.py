@@ -30,7 +30,13 @@ class Evidence(BaseModel):
     value: float = Field(description="Verilen tablolardaki degerin aynisi.")
     unit: str = Field(description="Birim: TL, adet, %, ay, oran, sayi.")
     entity: str | None = Field(
-        default=None, description="Ilgili kayit kodu, or. 'U005'. Portfoy geneli ise bos."
+        default=None,
+        description=(
+            "Degerin ait oldugu kapsam. Tek bir kayit ise kodu ('U005', 'K011'); "
+            "bir kategori/depo/platform kirilimi ise o boyutun adi ('Cantalik', "
+            "'Yan Depo'); yalnizca portfoyun tamamiysa bos birak. "
+            "Kirilim degerini bos birakma -- o zaman portfoy geneliyle karisir."
+        ),
     )
     period: str | None = Field(default=None, description="Donem, or. '2026-03'.")
 

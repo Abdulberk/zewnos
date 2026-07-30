@@ -50,9 +50,17 @@ class Settings(BaseSettings):
     ai_max_retries: int = 3
     ai_cache_enabled: bool = True
 
-    # Prompt suru mu: degistiginde onbellek anahtari degisir, boylece eski
-    # analizler yeni prompt ile karismaz.
-    prompt_version: str = "v1"
+    # Prompt surumu: onbellek anahtarinin parcasi. Degistiginde eski analizler
+    # otomatik gecersizlesir -- yeni prompt ile uretilmemis bir cikti sessizce
+    # servis edilmez.
+    #   v1 -> v2: donem sorusuna o doneme ait "anlik goruntu" tablosu eklendi ve
+    #             iki tablo da kapsamiyla etiketlendi (seri toplami / tek donem).
+    #             Sebep: model seri toplamini tek bir doneme atfediyordu.
+    #   v2 -> v3: Evidence.entity alani boyut kirilimlerini de kapsayacak sekilde
+    #             tarif edildi. Sebep: model kategori seviyesi bir degeri dogru
+    #             alintiliyor ama kapsamini bos birakiyordu; dogrulayici da onu
+    #             portfoy geneliyle karsilastirip yanlis alarm veriyordu.
+    prompt_version: str = "v3"
 
     @field_validator("upload_dir")
     @classmethod
