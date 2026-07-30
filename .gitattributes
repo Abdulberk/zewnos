@@ -1,0 +1,20 @@
+# Tum metin dosyalari depoda LF ile saklanir. Windows'ta calisan bir gelistirici
+# checkout'ta CRLF gorur, commit'te LF'e donusur.
+* text=auto eol=lf
+
+# Ikili dosyalar donusumden muaf tutulur -- aksi halde bozulurlar.
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.db    binary
+*.sqlite3 binary
+
+# CSV'ler metin ama ornek verilerin baytlari onemli (encoding testleri bunlara
+# dayaniyor): satir sonu normalizasyonu yapilsin, baska mudahale olmasin.
+*.csv   text eol=lf
+
+# GitHub dil istatistiklerinde ornek veri ve uretilmis sema sayilmasin.
+data/samples/*.csv  linguist-generated=true
+openapi.json        linguist-generated=true
