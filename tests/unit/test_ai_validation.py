@@ -6,7 +6,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.ai.ai_schemas import Action, Evidence, PeriodAnalysis
-from app.ai.context import build_shared_context, build_system_prompt
+from app.ai.context import build_period_question, build_shared_context, build_system_prompt
 from app.ai.validation import FactIndex, collect_evidence, verify
 from app.domain.models import AnalyticsResult
 from app.domain.packs.base import DatasetPack
@@ -229,3 +229,58 @@ def test_donem_sorusu_yalnizca_o_donemi_hedefler(
     assert "delta_vs_prev" in question
     # mover metrik adi teknik haliyle verilmeli ki model kanitta kopyalayabilsin
     assert "`cikis_miktar_change`" in question
+
+
+# ---------------------------------------------------------------------------
+# Donem sorusu: karsilastirma icin gereken sayilar promptta olmali
+# ---------------------------------------------------------------------------
+def test_donem_sorusu_onceki_donemin_anlik_goruntusunu_icerir(
+    sonart_result: AnalyticsResult, sonart_pack: DatasetPack
+):
+    """`delta_vs_prev` bir karsilastirma istiyor; tabani da verilmeli.
+
+    Verilmezse modelin kayit bazinda elindeki tek diger sayi seri geneli ozet
+    olur ve "gecen donem" yerine `son_*` degerini alintilar. Olculen ornek:
+    "marj %30.5'ten %21.0'e dustu" -- %30.5 serinin SON donemine ait.
+    Sayi tablolarda gercekten var oldugu icin grounding dogrulayici bunu
+    yakalayamaz; boslugun promptta kapanmasi gerekiyor.
+    """
+    periods = sonart_result.periods
+    onceki, simdiki = periods[1], periods[2]
+    delta = next(d for d in sonart_result.deltas if d.period == simdiki)
+    assert delta.previous_period == onceki
+
+    soru = build_period_question(simdiki, delta, sonart_result, sonart_pack)
+
+    assert f"## {simdiki} anlik goruntusu" in soru
+    assert f"## {onceki} anlik goruntusu" in soru
+    assert "KARSILASTIRMA TABANI" in soru
+
+    # Iki tablo da ayni kayitlarin O DONEME ait degerlerini tasimali
+    def satir(period: str, kod: str, kolon: str) -> float:
+        row = next(
+            r for r in sonart_result.series_rows if r["stok_kodu"] == kod and r["donem"] == period
+        )
+        return float(row[kolon])
+
+    kod = sonart_result.entity_rows[0]["stok_kodu"]
+    for period in (onceki, simdiki):
+        deger = satir(period, kod, "donem_sonu_stok")
+        assert f"{deger:,.0f}".replace(",", ".") in soru or str(int(deger)) in soru
+
+
+def test_ilk_donemde_karsilastirma_tabani_verilmez(
+    sonart_result: AnalyticsResult, sonart_pack: DatasetPack
+):
+    """Ilk donemin oncesi yok; olmayan bir tabani uydurmamali."""
+    ilk = sonart_result.periods[0]
+    delta = next((d for d in sonart_result.deltas if d.period == ilk), None)
+    soru = build_period_question(ilk, delta, sonart_result, sonart_pack)
+    assert "KARSILASTIRMA TABANI" not in soru
+    assert f"## {ilk} anlik goruntusu" in soru
+
+
+def test_sistem_promptu_ilk_son_kolonlarini_uyarir(sonart_pack: DatasetPack):
+    """`ilk_*`/`son_*` seri uclarini gosterir; komsu donem sanilmamali."""
+    prompt = build_system_prompt(sonart_pack)
+    assert "SERININ ilk/son donemine aittir" in prompt

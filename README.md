@@ -19,16 +19,35 @@
 
 ### Ekran görüntüleri
 
-| | |
-|---|---|
-| `docs/screenshots/01-dashboard.png` | Genel bakış: KPI kartları + 6 aylık trend |
-| `docs/screenshots/02-veri-kalitesi.png` | Veri kalitesi paneli — bulgu ve yapılan işlem |
-| `docs/screenshots/03-risk-sicili.png` | Risk sicili, parasal etki ve kanıtlar |
-| `docs/screenshots/04-donemsel-analiz.png` | Döneme özgü AI analizi ve aksiyonlar |
-| `docs/screenshots/05-soru-cevap.png` | Veri üzerinde serbest soru-cevap |
+Aşağıdaki kareler örnek veriyle (`sonart_erp_bozuk_encoding.csv`) çalışan
+uygulamadan alınmıştır.
 
-**Ekran kaydı:** kısa gezinti videosu — dashboard, veri kalitesi paneli, risk sicili
-ve soru-cevap.
+**Genel bakış** — son dönemin KPI'ları, 6 aylık trend grafikleri ve en kritik
+riskler. Ciro (TL) ile marj (%) farklı ölçekler olduğu için bilerek ayrı
+grafiklerde, ortak x ekseniyle.
+
+![Dashboard: KPI kartları ve 6 aylık trend grafikleri](docs/screenshots/01-dashboard.png)
+
+**Veri kalitesi** — her bulgu, *ne yapıldığı* rozetiyle birlikte. Bozuk
+karakter kodlaması onarımının öncesi/sonrası örnekleri burada görünüyor.
+
+![Veri kalitesi paneli: bulgular ve yapılan işlemler](docs/screenshots/02-veri-kalitesi.png)
+
+**Risk sicili** — parasal etkiye göre sıralı 18 risk. Açılan kayıtta gerekçe,
+öneri ve her iddianın dayandığı hesaplanmış sayılar.
+
+![Risk sicili: parasal etki grafiği ve kanıtlar](docs/screenshots/03-risk-sicili.png)
+
+**Dönemsel AI analizi** — altı dönemin her biri için ayrı hikâye ve aksiyonlar.
+`delta_vs_prev` şemada zorunlu olduğu için model her dönemde *ne değiştiğini*
+söylemek zorunda; dönemsel farklılaşma bu sayede görünür.
+
+![Dönemsel AI analizi: yönetici özeti ve döneme özgü aksiyonlar](docs/screenshots/04-donemsel-analiz.png)
+
+**Soru-cevap** — serbest soru, kanıtlı yanıt, güven rozeti ve kanıt doğrulama
+oranı.
+
+![Soru-cevap: kanıtlı yanıt ve doğrulama oranı](docs/screenshots/05-soru-cevap.png)
 
 ---
 
@@ -478,11 +497,57 @@ boş bıraktı — çünkü alanın açıklaması *"kayıt kodu, ya da portföy 
 boş"* diyordu ve bir kategori ikisi de değildi. Doğrulayıcı portföy toplamıyla
 karşılaştırıp sapma raporladı. Çözüm: alana kırılım için yuva açmak.
 
-Ders (üç kez öğrenildi): **doğrulama katmanı da bir yazılımdır ve o da hata
-yapar.** "AI hata yaptı" demeden önce doğrulayıcıyı doğrulamak gerekiyor — ve
-bir modelin hatası çoğu zaman ona verilmemiş bir bilginin izidir. Üç bulgunun
-üçü de $0 prompt/kod düzeltmesiyle çözüldü; hiçbiri için daha pahalı bir model
-gerekmedi.
+**Dördüncü zorluk en öğreticisi: grounding %100 iken bir cümle hâlâ
+yanlıştı.**
+
+Teslim öncesi iki ayrı veri setinde koşu yaptım; ikisinde de doğrulayıcı
+**%100** dedi (127/127 ve 118/118). Yine de anlatının tamamını ayrı bir
+denetimden geçirdim: düzyazıdaki her sayıyı hesaplanmış 822 değere karşı
+aradım. Koşulardan **birinde** Mart analizinde şu cümle çıktı:
+
+> *"U007 Cortina: birim maliyet bu dönem 166 TL'ye sıçradı ve marj
+> **%30,5**'ten %21,0'e düştü."*
+
+U007'nin gerçek marj serisi: 42,86 → 41,90 → **20,95** → 23,33 → 26,67 → 30,48.
+Yani Mart'ta marj **%41,9**'dan %21,0'e düşmüştü. Model'in yazdığı %30,5 ise
+`son_marj_yuzde` — serinin **Haziran** değeri.
+
+Doğrulayıcı bunu neden yakalayamadı? Çünkü **yakalayamaz**: 30,48 tablolarda
+gerçekten var. Grounding her rakamın *var olduğunu* doğrular, o rakamın *doğru
+yere konduğunu* değil. Üstelik bu iddia `evidence` alanında değil, düzyazıda —
+doğrulayıcı yalnızca kanıt kalemlerine bakıyor.
+
+Sebep yine bendeydi: `delta_vs_prev` alanı *"geçen döneme göre ne değişti"* diye
+bir **karşılaştırma** istiyor, ama modele sadece **o dönemin** anlık görüntüsünü
+veriyordum. Kayıt bazında elindeki tek diğer sayı seri özeti (`ilk_*`, `son_*`)
+olunca, karşılaştırmanın "önce" tarafını oradan aldı. Üçüncü zorluğun aynısı,
+bir adım ötesi: o zaman *bu* dönemi vermiştim, *önceki* dönemi hiç vermemişim.
+
+Düzeltme:
+
+1. Dönem sorusuna **bir önceki dönemin anlık görüntüsü** eklendi, açıkça
+   *"KARŞILAŞTIRMA TABANI"* diye etiketlendi.
+2. Sistem promptuna kural `1c` girdi: *"`ilk_*` ve `son_*` kolonları serinin
+   ilk/son dönemine aittir; 'geçen dönem' anlamına GELMEZ."*
+3. İki test bunu kilitledi: dönem sorusu tabanı içermeli, ilk dönemde
+   içermemeli ([`tests/unit/test_ai_validation.py`](tests/unit/test_ai_validation.py)).
+
+Kritik ayrıntı: **aynı prompt, aynı model, iki koşu — birinde hata var,
+diğerinde yok.** Diğer koşuda model aynı sayıyı doğru kullandı, hatta kapsamını
+kendisi etiketledi: *"serinin dönem sonu marjından (%30,48) bile daha kötü bir
+nokta."* Aralıklı olması hatayı önemsiz yapmıyor, tam tersi: **belirsizlik,
+promptta bir boşluk olduğunun işareti.** Model bazen doğru tahmin ediyordu,
+çünkü tahmin etmek zorundaydı.
+
+Ölçülen ek yük: dönem başına ~370 token, tam koşuda **$0,004**.
+
+Ders (dört kez öğrenildi): **doğrulama katmanı da bir yazılımdır ve o da hata
+yapar** — üstelik hata yapmadığında bile *neyi doğrulamadığını* bilmek gerekir.
+Grounding %100, "her sayı gerçek" demektir; "her cümle doğru" demek değildir.
+"AI hata yaptı" demeden önce doğrulayıcıyı doğrulamak, sonra da modele neyi
+vermediğimi sormak gerekiyor: bir modelin hatası çoğu zaman ona verilmemiş bir
+bilginin izidir. Dört bulgunun dördü de $0 prompt/kod düzeltmesiyle çözüldü;
+hiçbiri için daha pahalı bir model gerekmedi.
 
 ---
 

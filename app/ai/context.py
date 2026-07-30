@@ -72,6 +72,11 @@ gerektigini* bilmek istiyor.
    ait bir degeri tek bir doneme aitmis gibi anlatma. Bir donemi
    anlatirken o donemin anlik goruntu tablosunu kullan; seri toplamlarini
    yalnizca "alti donem boyunca" gibi acikca genel ifadelerle kullan.
+1c. **`ilk_*` ve `son_*` kolonlari SERININ ilk/son donemine aittir.** Bunlar
+   "gecen donem" ya da "bu donem" demek DEGILDIR. Iki donemi karsilastirirken
+   (or. "%X'ten %Y'ye dustu") iki degeri de anlik goruntu tablolarindan al:
+   X karsilastirma tabani tablosundan, Y analiz edilen donem tablosundan.
+   Karsilastirma tabani verilmemisse o karsilastirmayi hic kurma.
 2. **Her aksiyon kanit tasimali.** `evidence` alanina yazdigin her deger
    tablolarda birebir bulunmali; metrik adini da tablodaki teknik adiyla yaz.
    Kanitin `entity` alanina degerin KAPSAMINI yaz: tek kayitsa kodunu, bir
@@ -310,6 +315,31 @@ def build_period_question(
             "",
             snapshot,
         ]
+
+    # Onceki donemin anlik goruntusu. `delta_vs_prev` alani "gecen doneme gore
+    # ne degisti" diye soruyor; onceki donemin kayit bazli degerleri verilmezse
+    # modelin elindeki tek diger sayi seri geneli ozet oluyor ve "onceki donem"
+    # yerine `son_*` / `ilk_*` degerini aliyor. Olculen ornek: Mart analizinde
+    # U007 icin "marj %30.5'ten %21.0'e dustu" -- %30.5 son_marj_yuzde, yani
+    # Haziran degeri; Subat gercegi %41.9. Sayi tablolarda VAR oldugu icin
+    # grounding dogrulayici bunu yakalayamaz; boslugu prompt tarafinda kapatmak
+    # gerekiyor.
+    previous = delta.previous_period if delta is not None else None
+    if previous:
+        previous_snapshot = _period_snapshot(previous, result, pack)
+        if previous_snapshot:
+            parts += [
+                "",
+                f"## {previous} anlik goruntusu — KARSILASTIRMA TABANI",
+                (
+                    f"`delta_vs_prev` alaninda 'X'ten Y'ye' derken X'i BURADAN, "
+                    f"Y'yi {period} tablosundan al. Seri ozetindeki `ilk_*` ve "
+                    "`son_*` kolonlari serinin ilk/son donemine aittir; bir "
+                    "onceki donem ANLAMINA GELMEZ, karsilastirmada kullanma."
+                ),
+                "",
+                previous_snapshot,
+            ]
 
     parts += [
         "",

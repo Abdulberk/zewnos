@@ -68,7 +68,15 @@ class Settings(BaseSettings):
     #             onu taklit etme"). Sebep: prompt ASCII oldugu icin model bazi
     #             alanlarda uslubu aynalayip "kapama suresi 8.16 ay" gibi ASCII
     #             Turkce uretiyordu; ozellikle ilk donem ve soru-cevap ucunda.
-    prompt_version: str = "v5"
+    #   v5 -> v6: donem sorusuna BIR ONCEKI donemin anlik goruntusu eklendi ve
+    #             `ilk_*`/`son_*` kolonlarinin seri uclarini gosterdigi acikca
+    #             yazildi. Sebep: `delta_vs_prev` bir karsilastirma istiyordu
+    #             ama tabani verilmiyordu; model kayit bazinda tek bulabildigi
+    #             sayiya, seri ozetine uzaniyordu. Olculen: Mart analizinde
+    #             U007 icin "marj %30.5'ten %21.0'e dustu" -- %30.5 Haziran
+    #             degeri, Subat gercegi %41.9. Sayi tablolarda var oldugu icin
+    #             grounding %100 kaliyor; dogrulayici degil prompt eksikti.
+    prompt_version: str = "v6"
 
     @field_validator("upload_dir")
     @classmethod
