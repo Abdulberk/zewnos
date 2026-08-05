@@ -70,10 +70,11 @@ def create_app() -> FastAPI:
         redoc_url="/redoc",
     )
 
-    # Next.js gelistirme sunucusu ayri portta calisiyor.
+    # Next.js arayuzu ayri kokende calisiyor. Izinli kokenler ayardan gelir;
+    # dagitilmis bir arayuz eklendiginde kod degil ortam degiskeni degisir.
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+        allow_origins=settings.allowed_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

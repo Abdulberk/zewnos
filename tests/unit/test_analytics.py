@@ -294,3 +294,26 @@ def test_departman_anahtari_ile_etiketi_ayridir(sonart_pack, ads_pack):
     assert sonart.department_label("uretim") == "Üretim"
     # taninmayan anahtar sessizce kaybolmaz, oldugu gibi doner
     assert sonart.department_label("bilinmeyen") == "bilinmeyen"
+
+
+def test_cors_kokenleri_ortamdan_okunur(monkeypatch):
+    """Dagitilmis arayuzun adresi kodda degil ayarda olmali.
+
+    pydantic-settings list[str] alanini ortamdan yalnizca JSON olarak cozer ve
+    bunu alan dogrulayicisindan once yapar; bu yuzden alan duz metin tutulup
+    `allowed_origins` ile listeye ceviriliyor. Dagitim panellerine JSON yazmak
+    hataya acik oldugu icin virgullu biçim destekleniyor.
+    """
+    from app.core.config import Settings
+
+    varsayilan = Settings(_env_file=None)
+    assert varsayilan.allowed_origins == [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+
+    monkeypatch.setenv("CORS_ORIGINS", "https://a.vercel.app, https://b.example.com")
+    assert Settings(_env_file=None).allowed_origins == [
+        "https://a.vercel.app",
+        "https://b.example.com",
+    ]

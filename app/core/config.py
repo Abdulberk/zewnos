@@ -28,6 +28,17 @@ class Settings(BaseSettings):
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     api_prefix: str = "/api/v1"
 
+    # Tarayicidan cagiran arayuzlerin kokenleri, virgulle ayrilmis. Varsayilan
+    # yalnizca yerel Next.js gelistirme sunucusu; dagitilmis bir arayuz
+    # eklenecekse ortam degiskeniyle verilir. Kodda sabit tutmak, arayuzun her
+    # yeni adresinde backend'i yeniden dagitmayi gerektirirdi.
+    #
+    # Tip neden list[str] degil: pydantic-settings karmasik alanlari ortamdan
+    # yalnizca JSON olarak cozer ve bunu alan dogrulayicisindan ONCE yapar --
+    # dagitim paneline JSON yazmak hataya acik. Duz metin alip `allowed_origins`
+    # ile listeye ceviriyoruz.
+    cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+
     # --- depolama ---
     database_url: str = "sqlite+aiosqlite:///./sonart.db"
     upload_dir: Path = Path("./storage/uploads")
@@ -83,6 +94,11 @@ class Settings(BaseSettings):
     def _ensure_upload_dir(cls, value: Path) -> Path:
         value.mkdir(parents=True, exist_ok=True)
         return value
+
+    @property
+    def allowed_origins(self) -> list[str]:
+        """CORS icin izinli kokenler."""
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 
     @property
     def ai_configured(self) -> bool:
