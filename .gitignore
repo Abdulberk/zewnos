@@ -23,6 +23,14 @@ storage/uploads/*
 *.db
 *.sqlite3
 
+# --- demo tohum verisi (istisna) ---
+# Render'in diski kalicidegil: her yeniden baslatmada calisma zamani
+# dosyalari silinir. Demo ortaminin bos acilmamasi icin ornek veri
+# setleri ve onlarin uretilmis analizleri depoda tutuluyor.
+# Uretim ortaminda bunlarin yeri veritabani ve nesne deposudur.
+!sonart.db
+!storage/uploads/*.csv
+
 # --- editor / os ---
 .vscode/
 .idea/

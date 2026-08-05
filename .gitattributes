@@ -18,3 +18,7 @@
 # GitHub dil istatistiklerinde ornek veri ve uretilmis sema sayilmasin.
 data/samples/*.csv  linguist-generated=true
 openapi.json        linguist-generated=true
+
+# Demo tohum verisi: baytlari birebir korunmali (icerik ozeti veritabaninda kayitli)
+storage/uploads/*.csv -text
+sonart.db binary
